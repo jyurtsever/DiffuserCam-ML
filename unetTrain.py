@@ -49,13 +49,13 @@ def run_train(model, optimizer, loss_fn, train_loader, num_epochs):
         train(model, optimizer, loss_fn, train_loader, epoch)
 
 
-def unet_optimize():
+def unet_optimize(args):
     train_set = DiffuserDataset(csv_path, rec_dir, gt_dir)
     train_loader = torchdata.DataLoader(train_set, batch_size = BATCH_SIZE, shuffle = False)
     model = UNet512512((3, 128, 128))
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters())
-    run_train(model, optimizer, loss_fn, train_loader, 1)
+    run_train(model, optimizer, loss_fn, train_loader, int(args[2]))
 
 
 if __name__ == '__main__':
@@ -63,5 +63,5 @@ if __name__ == '__main__':
     csv_path = data_dir + 'filenames.csv'
     gt_dir = data_dir + 'gt'
     rec_dir = data_dir + 'recon'
-    model = unet_optimize()
+    model = unet_optimize(sys.argv)
     # evaluate(model)

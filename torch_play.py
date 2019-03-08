@@ -169,5 +169,4 @@ def evaluate(model, test_loader):
 
 if __name__ == '__main__':
     model, test_loader = conv_optimize()
-
     evaluate(model, test_loader)
