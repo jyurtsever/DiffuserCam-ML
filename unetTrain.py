@@ -12,6 +12,7 @@ import scipy.misc as scm
 import matplotlib.pyplot as plt
 import matplotlib.image as img
 import cv2
+import sys
 from reconNet import *
 from sklearn.model_selection import train_test_split
 from torch.autograd import Variable
@@ -22,10 +23,7 @@ BATCH_SIZE = 32
 
 
 
-data_dir =  '/Users/jyurtsever/Desktop/junior/research/spring2019/diffuser_recon/mirflickr25k_128_data/'
-csv_path = data_dir + 'filenames.csv'
-gt_dir = data_dir + 'gt'
-rec_dir = data_dir + 'recon'
+
 
 
 def train(model, optimizer, loss_fn, train_loader, epoch):
@@ -61,5 +59,9 @@ def unet_optimize():
 
 
 if __name__ == '__main__':
+    data_dir = sys.argv[1]
+    csv_path = data_dir + 'filenames.csv'
+    gt_dir = data_dir + 'gt'
+    rec_dir = data_dir + 'recon'
     model = unet_optimize()
     # evaluate(model)
