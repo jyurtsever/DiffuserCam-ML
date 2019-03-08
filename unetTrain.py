@@ -40,9 +40,9 @@ def train(model, optimizer, loss_fn, train_loader, epoch):
                 epoch, batch_idx*len(X_batch), len(train_loader.dataset), 100.*batch_idx / \
                 len(train_loader), loss.item()))
     o = output.detach().numpy()
-    print(o.shape)#o.reshape((128, 128, 3, 32))
-    # plt.imshow(o[:, :, :, 0])
-    # plt.show()
+    o.reshape((128, 128, 3, o.shape[0]))
+    plt.imshow(o[:, :, :, 0])
+    plt.show()
 
 def run_train(model, optimizer, loss_fn, train_loader, num_epochs):
     for epoch in range(num_epochs):
