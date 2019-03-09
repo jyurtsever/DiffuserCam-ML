@@ -53,6 +53,8 @@ def unet_optimize(args):
     train_set = DiffuserDataset(csv_path, rec_dir, gt_dir)
     train_loader = torchdata.DataLoader(train_set, batch_size = BATCH_SIZE, shuffle = False)
     model = UNet512512((3, 128, 128))
+    if use_gpu:
+        model = model.cuda(device=gpu_dev)
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters())
     run_train(model, optimizer, loss_fn, train_loader, int(args[2]))
@@ -63,5 +65,8 @@ if __name__ == '__main__':
     csv_path = data_dir + 'filenames.csv'
     gt_dir = data_dir + 'gt'
     rec_dir = data_dir + 'recon'
+    use_gpu = sys.argv[3] == 'gpu'
+    if use_gpu:
+        gpu_dev = int(sys.argv[4])
     model = unet_optimize(sys.argv)
     # evaluate(model)
