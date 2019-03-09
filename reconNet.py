@@ -56,14 +56,15 @@ class DiffuserDataset(Dataset):
        # plt.show()
        # plt.imshow(label.numpy().reshape((128, 128, 3)).astype('uint8'))
        # plt.show()
+       if self.use_gpu:
+           image = image.cuda()
+           label = label.cuda()
+
        sample = {'image': image, 'label': label}
 
        if self.transform:
            sample = self.transform(sample)
 
-       if self.use_gpu:
-           image = image.cuda()
-           label = label.cuda()
        return sample
 
 class FLIP(object):
