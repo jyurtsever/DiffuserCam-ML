@@ -42,7 +42,7 @@ def train(model, optimizer, loss_fn, train_loader, epoch):
 #    o = output.detach().numpy()
 #    o = o.reshape((128, 128, 3, o.shape[0]))
 #    plt.imshow(o[:, :, :, 0].astype('uint8'))
-#    ZZplt.show()
+#    plt.show()
 
 def run_train(model, optimizer, loss_fn, train_loader, num_epochs):
     for epoch in range(num_epochs):
