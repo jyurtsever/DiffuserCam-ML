@@ -50,7 +50,7 @@ def run_train(model, optimizer, loss_fn, train_loader, num_epochs):
 
 
 def unet_optimize(args):
-    train_set = DiffuserDataset(csv_path, rec_dir, gt_dir)
+    train_set = DiffuserDataset(csv_path, rec_dir, gt_dir, use_gpu=use_gpu)
     train_loader = torchdata.DataLoader(train_set, batch_size = BATCH_SIZE, shuffle = False)
     model = UNet512512((3, 128, 128))
     if use_gpu:

@@ -22,7 +22,7 @@ from torch.utils.data import Dataset
 class DiffuserDataset(Dataset):
    """Diffuser dataset."""
 
-   def __init__(self, csv_file, data_dir, label_dir, transform=None):
+   def __init__(self, csv_file, data_dir, label_dir, transform=None, use_gpu = False):
        """
        Args:
            csv_file (string): Path to the csv file with annotations.
@@ -35,6 +35,7 @@ class DiffuserDataset(Dataset):
        self.data_dir = data_dir
        self.label_dir = label_dir
        self.transform = transform
+       self.use_gpu = use_gpu
 
    def __len__(self):
        return len(self.csv_contents)
@@ -60,6 +61,9 @@ class DiffuserDataset(Dataset):
        if self.transform:
            sample = self.transform(sample)
 
+       if self.use_gpu:
+           image = image.cuda()
+           label = label.cuda()
        return sample
 
 class FLIP(object):
