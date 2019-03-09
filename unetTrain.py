@@ -39,10 +39,10 @@ def train(model, optimizer, loss_fn, train_loader, epoch):
             print('Epoch : {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx*len(X_batch), len(train_loader.dataset), 100.*batch_idx / \
                 len(train_loader), loss.item()))
-    o = output.detach().numpy()
-    o = o.reshape((128, 128, 3, o.shape[0]))
-    plt.imshow(o[:, :, :, 0].astype('uint8'))
-    plt.show()
+#    o = output.detach().numpy()
+#    o = o.reshape((128, 128, 3, o.shape[0]))
+#    plt.imshow(o[:, :, :, 0].astype('uint8'))
+#    ZZplt.show()
 
 def run_train(model, optimizer, loss_fn, train_loader, num_epochs):
     for epoch in range(num_epochs):
