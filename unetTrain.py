@@ -65,8 +65,8 @@ if __name__ == '__main__':
     csv_path = data_dir + 'filenames.csv'
     gt_dir = data_dir + 'gt'
     rec_dir = data_dir + 'recon'
-    use_gpu = sys.argv[3] == 'gpu'
+    use_gpu = sys.argv[2] == 'gpu'
     if use_gpu:
-        gpu_dev = int(sys.argv[4])
+        gpu_dev = int(sys.argv[3])
     model = unet_optimize(sys.argv)
     # evaluate(model)
