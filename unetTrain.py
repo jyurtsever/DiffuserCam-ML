@@ -17,7 +17,7 @@ from reconNet import *
 from sklearn.model_selection import train_test_split
 from torch.autograd import Variable
 from torch.utils.data import Dataset
-BATCH_SIZE = 200
+# BATCH_SIZE = 200
 
 
 
@@ -66,5 +66,6 @@ if __name__ == '__main__':
     gt_dir = data_dir + 'gt'
     rec_dir = data_dir + 'recon'
     use_gpu = sys.argv[3] == 'gpu'
+    BATCH_SIZE = int(sys.argv[4])
     model = unet_optimize(sys.argv)
     # evaluate(model)
