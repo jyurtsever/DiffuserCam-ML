@@ -51,7 +51,7 @@ def evaluate(model, loss_fn, test_loader):
         print('[{}/{} ({:.0f}%)] \t Test Loss: {:.6f}'.format(
             batch_idx*len(X_batch), len(test_loader.dataset), 100.*batch_idx / \
                 len(test_loader), loss.item()))
-    out = output.detach().numpy().cpu()
+    out = output..cpu().detach().numpy()
     out = out.reshape((128, 128, 3, out.shape[0]))
     np.save("test_results.npy", out)
 
