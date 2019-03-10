@@ -39,10 +39,22 @@ def train(model, optimizer, loss_fn, train_loader, epoch):
             print('Epoch : {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx*len(X_batch), len(train_loader.dataset), 100.*batch_idx / \
                 len(train_loader), loss.item()))
-#    o = output.detach().numpy()
-#    o = o.reshape((128, 128, 3, o.shape[0]))
-#    plt.imshow(o[:, :, :, 0].astype('uint8'))
-#    plt.show()
+
+def evaluate(model, loss_fn, test_loader):
+    output = None
+    for batch_idx, item in enumerate(test_loader):
+        X_batch, Y_batch = item['image'], item['label']
+        # print(X_batch.shape, "okkkkkk")
+        output = model(X_batch)
+        loss = loss_fn(output, Y_batch)
+        loss.backward()
+        print('[{}/{} ({:.0f}%)] \t Test Loss: {:.6f}'.format(
+            batch_idx*len(X_batch), len(test_loader.dataset), 100.*batch_idx / \
+                len(test_loader), loss.item()))
+    if output:
+        out = output.detach().numpy()
+        out = out.reshape((128, 128, 3, o.shape[0]))
+        np.save("test_results", out)
 
 def run_train(model, optimizer, loss_fn, train_loader, num_epochs):
     for epoch in range(num_epochs):
@@ -50,22 +62,26 @@ def run_train(model, optimizer, loss_fn, train_loader, num_epochs):
 
 
 def unet_optimize(args):
-    train_set = DiffuserDataset(csv_path, rec_dir, gt_dir, use_gpu=use_gpu)
+    train_set = DiffuserDataset(csv_path_train, rec_dir, gt_dir, use_gpu=use_gpu)
+    test_set = DiffuserDataset(csv_path_test, rec_dir, gt_dir, use_gpu=use_gpu)
+
     train_loader = torchdata.DataLoader(train_set, batch_size = BATCH_SIZE, shuffle = False)
+    test_loader = torchdata.DataLoader(test_set, batch_size = BATCH_SIZE, shuffle = False)
+
     model = UNet512512((3, 128, 128))
     if use_gpu:
         model = model.cuda()
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters())
     run_train(model, optimizer, loss_fn, train_loader, int(args[2]))
-
+    evaluate(model, loss_fn, test_loader)
 
 if __name__ == '__main__':
     data_dir = sys.argv[1]
-    csv_path = data_dir + 'filenames.csv'
+    csv_path_test = data_dir + 'test_names.csv'
+    csv_path_train = data_dir + 'train_names.csv'
     gt_dir = data_dir + 'gt'
     rec_dir = data_dir + 'recon'
     use_gpu = sys.argv[3] == 'gpu'
     BATCH_SIZE = int(sys.argv[4])
     model = unet_optimize(sys.argv)
-    # evaluate(model)
