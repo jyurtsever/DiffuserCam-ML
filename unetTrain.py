@@ -54,7 +54,7 @@ def evaluate(model, loss_fn, test_loader):
     if output:
         out = output.detach().numpy()
         out = out.reshape((128, 128, 3, o.shape[0]))
-        np.save("test_results", out)
+        np.save("test_results.npy", out)
 
 def run_train(model, optimizer, loss_fn, train_loader, num_epochs):
     for epoch in range(num_epochs):
