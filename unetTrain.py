@@ -51,10 +51,9 @@ def evaluate(model, loss_fn, test_loader):
         print('[{}/{} ({:.0f}%)] \t Test Loss: {:.6f}'.format(
             batch_idx*len(X_batch), len(test_loader.dataset), 100.*batch_idx / \
                 len(test_loader), loss.item()))
-    if output:
-        out = output.detach().numpy()
-        out = out.reshape((128, 128, 3, o.shape[0]))
-        np.save("test_results.npy", out)
+    out = output.detach().numpy()
+    out = out.reshape((128, 128, 3, o.shape[0]))
+    np.save("test_results.npy", out)
 
 def run_train(model, optimizer, loss_fn, train_loader, num_epochs):
     for epoch in range(num_epochs):
