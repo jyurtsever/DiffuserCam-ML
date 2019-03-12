@@ -46,24 +46,21 @@ class DiffuserDataset(Dataset):
            if len(img.shape) > 2 and img.shape[2] == 4:
                img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
            return img.astype('uint8')
+
        img_name = self.csv_contents.iloc[idx,0]
 
-       image = initialize_img(os.path.join(self.data_dir, img_name))#plt.imread(os.path.join(self.data_dir, img_name))
-       label = initialize_img(os.path.join(self.label_dir, img_name)) #plt.imread(os.path.join(self.label_dir, img_name))
-       image = torch.from_numpy(image).view(3,128,128).float()
-       label = torch.from_numpy(label).view(3,128,128).float()
-       # plt.imshow(image)
-       # plt.show()
-       # plt.imshow(label.numpy().reshape((128, 128, 3)).astype('uint8'))
-       # plt.show()
+       image = initialize_img(os.path.join(self.data_dir, img_name))
+       label = initialize_img(os.path.join(self.label_dir, img_name))
+
+       if self.transform:
+           image = self.transform(image)
+           label = self.transform(label)
+
        if self.use_gpu:
            image = image.cuda()
            label = label.cuda()
 
        sample = {'image': image, 'label': label}
-
-       if self.transform:
-           sample = self.transform(sample)
 
        return sample
 

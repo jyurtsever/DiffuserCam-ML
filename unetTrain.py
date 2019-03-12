@@ -3,6 +3,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.data as torchdata
+import torchvision.transforms as transforms
+import torchvision.datasets as datasets
 import pandas as pd
 import numpy as np
 import scipy.io as io
@@ -31,6 +33,10 @@ def train(model, optimizer, loss_fn, train_loader, epoch):
         X_batch, Y_batch = item['image'], item['label']
         optimizer.zero_grad()
         # print(X_batch.shape, "okkkkkk")
+        # plt.imshow(Y_batch[1, 1, :,:].numpy())
+        # plt.show()
+        # plt.imshow(X_batch[1, 1, :, :].numpy())
+        # plt.show()
         output = model(X_batch)
         loss = loss_fn(output, Y_batch)
         loss.backward()
@@ -61,9 +67,13 @@ def run_train(model, optimizer, loss_fn, train_loader, num_epochs):
 
 
 def unet_optimize(args):
-    train_set = DiffuserDataset(csv_path_train, rec_dir, gt_dir, use_gpu=use_gpu)
-    test_set = DiffuserDataset(csv_path_test, rec_dir, gt_dir, use_gpu=use_gpu)
-
+    transformations = transforms.Compose([transforms.ToTensor(),
+                                          transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                                               std=[0.229, 0.224, 0.225])])
+    train_set = DiffuserDataset(csv_path_train, rec_dir, gt_dir, transform=transformations, use_gpu=use_gpu)
+    test_set = DiffuserDataset(csv_path_test, rec_dir, gt_dir, transform=transformations, use_gpu=use_gpu)
+    # train_set = datasets.ImageFolder(csv_path_train, transform = transformations)
+    # test_set = datasets.ImageFolder(csv_path_test, transform=transformations)
     train_loader = torchdata.DataLoader(train_set, batch_size = BATCH_SIZE, shuffle = False)
     test_loader = torchdata.DataLoader(test_set, batch_size = BATCH_SIZE, shuffle = False)
 
