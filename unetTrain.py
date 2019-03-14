@@ -58,7 +58,8 @@ def evaluate(model, loss_fn, test_loader):
             batch_idx*len(X_batch), len(test_loader.dataset), 100.*batch_idx / \
                 len(test_loader), loss.item()))
     out = output.cpu().detach().numpy()
-    np.save("test_results.npy", out)
+    save_dict = {'pred': out, 'gt': Y_batch, 'recon': X_batch}
+    io.savemat('test.mat', save_dict)
 
 def run_train(model, optimizer, loss_fn, train_loader, num_epochs):
     for epoch in range(num_epochs):
