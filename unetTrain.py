@@ -29,7 +29,6 @@ from torch.utils.data import Dataset
 
 
 def train(model, optimizer, loss_fn, train_loader, epoch):
-    loss = None
     for batch_idx, item in enumerate(train_loader):
         X_batch, Y_batch = item['image'], item['label']
         optimizer.zero_grad()
@@ -46,7 +45,6 @@ def train(model, optimizer, loss_fn, train_loader, epoch):
             print('Epoch : {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx*len(X_batch), len(train_loader.dataset), 100.*batch_idx / \
                 len(train_loader), loss.item()))
-    return loss
 
 def evaluate(model, loss_fn, test_loader):
     output = None
@@ -65,12 +63,11 @@ def evaluate(model, loss_fn, test_loader):
 
 def run_train(model, optimizer, loss_fn, train_loader, num_epochs):
     for epoch in range(num_epochs):
-        loss = train(model, optimizer, loss_fn, train_loader, epoch)
+        train(model, optimizer, loss_fn, train_loader, epoch)
     torch.save({
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
-        'loss': loss
         }, "saved_network.pt")
 
 def unet_optimize(args):
