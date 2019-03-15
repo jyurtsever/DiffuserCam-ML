@@ -45,7 +45,7 @@ class DiffuserDataset(Dataset):
            # img = plt.imread(path)
            # if len(img.shape) > 2 and img.shape[2] == 4:
            #     img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
-           # return img.astype('uint8')
+           # return img.astype('uint8')#
            return cv2.imread(path, -1).astype(np.float32)/4095.
 
        img_name = self.csv_contents.iloc[idx,0]
