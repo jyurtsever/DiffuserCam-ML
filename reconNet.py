@@ -42,11 +42,12 @@ class DiffuserDataset(Dataset):
 
    def __getitem__(self, idx):
        def initialize_img(path):
-           # img = plt.imread(path)
-           # if len(img.shape) > 2 and img.shape[2] == 4:
-           #     img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
-           # return img.astype('uint8')#
-           return cv2.imread(path, -1).astype(np.float32)/4095.
+           img = cv2.imread(path, -1).astype(np.float32)/512
+           if len(img.shape) > 2 and img.shape[2] == 4:
+               img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
+           plt.imshow(img)
+           plt.show()
+           return img
 
        img_name = self.csv_contents.iloc[idx,0]
 
