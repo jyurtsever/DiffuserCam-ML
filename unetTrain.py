@@ -73,7 +73,7 @@ def run_train(model, optimizer, loss_fn, train_loader, num_epochs):
         }, "saved_network.pt")
 
 def unet_optimize(args):
-    transformations = transforms.Compose([transforms.ToTensor()]),
+    transformations = transforms.Compose([transforms.ToTensor()])
                                           #transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                                                std=[0.229, 0.224, 0.225])])
     train_set = DiffuserDataset(csv_path_train, rec_dir, gt_dir, transform=transformations, use_gpu=use_gpu)
