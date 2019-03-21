@@ -115,7 +115,7 @@ def run_recon_and_crop(num_photos, max_itr, im_path, gt_path, save_path, start=1
         blockPrint()
         im_file = im_path + 'im' + str(i) + '.jpg.tiff'
         gt_file = gt_path + 'im' + str(i) + '.jpg.tiff'
-        save_file_diffuser = save_path + 'recon/im' + str(i) + '.tiff'
+        save_file_diffuser = None #save_path + 'recon/im' + str(i) + '.tiff'
         crp_path = save_path + 'im' + str(i) + '.tiff'
         save_file_gt = save_path + 'gt/im' + str(i) + '.tiff'
         reconstruct_and_save(im_file, gt_file, save_file_diffuser, crp_path, save_file_gt, max_itr)
