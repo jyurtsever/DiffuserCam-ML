@@ -20,7 +20,7 @@ def initialize(image_file, psf_file, f_lat = 1, f_ax = 1, type = 'pco', color = 
         # image = np.array(np.load(image_file))
         # psf = np.array(np.load(psf_file))
         # image = np.array(Image.open(image_file))[:,:,ind].astype('float32')
-
+        print(np.array(cv2.imread(image_file ,-1)))
         image = np.array(cv2.imread(image_file ,-1))[: ,: ,ind].astype('float32')
 
         psf = io.loadmat(psf_file)['psf'] if psf_type == 'mat' else rgb2gray \
