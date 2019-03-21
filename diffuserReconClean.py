@@ -98,7 +98,7 @@ def reconstruct_and_save(image_file, gt_file, save_file_diffuser, save_file_crop
         # x = crop2d(x)
         x_rgb[:, :, i] = x[:, :, 0]
 
-    scipy.misc.imsave(save_file_diffuser, np.flipud(x_rgb))
+    # scipy.misc.imsave(save_file_diffuser, np.flipud(x_rgb))
     scipy.misc.imsave(save_file_crop_diffuser, crop2d(np.flipud(x_rgb)))
 
     # gt_image = cv2.imread(gt_file, -1).astype('float32')
@@ -116,7 +116,7 @@ def run_recon_and_crop(num_photos, max_itr, im_path, gt_path, save_path, start=1
         im_file = im_path + 'im' + str(i) + '.jpg.tiff'
         gt_file = gt_path + 'im' + str(i) + '.jpg.tiff'
         save_file_diffuser = save_path + 'recon/im' + str(i) + '.tiff'
-        crp_path = save_path + 'recon_cropped/im' + str(i) + '.tiff'
+        crp_path = save_path + 'im' + str(i) + '.tiff'
         save_file_gt = save_path + 'gt/im' + str(i) + '.tiff'
         reconstruct_and_save(im_file, gt_file, save_file_diffuser, crp_path, save_file_gt, max_itr)
 
