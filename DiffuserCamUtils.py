@@ -238,7 +238,7 @@ def solver(grad, error, prox, opt, init = None, live_display = False):
                 fig.canvas.draw()
         update_display(0, x0)
     else:
-        update_display = lambda i, x: None
+        update_display = lambda i, x, mu_i: None
 
     if opt.method == 'gd':
         algorithm = gd
