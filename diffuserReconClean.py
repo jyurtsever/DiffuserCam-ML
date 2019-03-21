@@ -213,7 +213,7 @@ if __name__ == '__main__':
     Xhat = ifft2c(fft2c(b) / H)
 
     ####  CALIBRATION #####
-    calibration_2_15 = io.loadmat('../recon_files/calibration_2mv_15_v2.mat')
+    calibration_2_15 = io.loadmat('../recon_files/calibration_2_15_v2.mat')
 
     M = calibration_2_15['M']
     mtx = calibration_2_15['mtx']
