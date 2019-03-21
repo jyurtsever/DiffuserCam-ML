@@ -208,7 +208,7 @@ opt: options object with switches.
 init: default initilization of object.
 live_display: if True, will live update image of object every 10 iterations.
 """
-def solver(grad, error, prox, opt, init = None, live_display = True):
+def solver(grad, error, prox, opt, init = None, live_display = False):
     if init:
         if init.shape == opt.pad_shape:
             x0 = init
