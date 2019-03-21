@@ -145,9 +145,9 @@ def main():
 
 if __name__ == '__main__':
     ###params###
-    num_photos = sys.argv[1]
-    num_iters = sys.argv[2]
-    start = sys.argv[3]
+    num_photos = int(sys.argv[1])
+    num_iters = int(sys.argv[2])
+    start = int(sys.argv[3])
 
     ## Background ###
     bg_file = '../recon_files/diffuser_background.tiff';
