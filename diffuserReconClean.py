@@ -160,7 +160,7 @@ if __name__ == '__main__':
     gt_path = '../mirflickr25k/gt'
 
     #####   SAVE FILE    #####
-    save_file_path = '../mirflickr25k_recon/'
+    save_file_path = sys.argv[4]
 
     ####       PSF       ####
     psf_file = '../recon_files/psf_white_LED_Nick.tiff'
