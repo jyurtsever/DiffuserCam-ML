@@ -10,7 +10,7 @@ import scipy
 import skimage
 import time
 import tensorflow.contrib.eager as tfe
-import tensorflow_probability as tfp
+#import tensorflow_probability as tfp
 
 
 def rgb2gray(rgb):
@@ -90,26 +90,22 @@ def gkern(DIMS0, DIMS1, nsig=3):
 
 
 def _read_py_function(filename, filename_gt, ds):
-    
-    path = '/media/midoridata/Kristina/mirflickr25k/'
+    path = '/home/jyurtsever/research/mirflickr25k/'
     
     name = filename.decode()
     path_diffuser = os.path.join(path, 'diffuser_images_2_14_auto/', name)
     path_gt = os.path.join(path, 'gt_images_2_14_auto/', name)
     
-    image_diffuser = cv.imread(path_diffuser, -1).astype(np.float32)/4095. - 0.008273973
-    image_gt = cv.imread(path_gt, -1).astype(np.float32)/4095. 
-    
+    image_diffuser = cv.imread(path_diffuser, -1).astype(np.float32)/2048. - 0.008273973
+    image_gt = cv.imread(path_gt, -1).astype(np.float32)/256. 
     image_diffuser_out = downsample_ax(image_diffuser, ds)
-    
     # Apply calibration 
-    calib_data = scipy.io.loadmat('/media/midoridata/Kristina/mirflickr25k/calibration_2_15_v2.mat')
-    image_gt_out = cv.undistort(image_gt, calib_data['mtx'], calib_data['dist'])  # Lens correction
-    image_gt_out = np.flipud(downsample_ax(image_gt_out, ds))                      # Downsample and flip
-    
-    #Warp image to align with Diffuser: 
-    image_gt_out = cv.warpAffine(image_gt_out, calib_data['M'], (image_gt_out.shape[1], image_gt_out.shape[0]))
-    
+    calib_data = scipy.io.loadmat('../recon_files/calibration_2_15_v2.mat')
+#     image_gt_out = cv.undistort(image_gt, calib_data['mtx'], calib_data['dist'])  # Lens correction
+#     image_gt_out = np.flipud(downsample_ax(image_gt_out, ds))                      # Downsample and flip
+    image_gt_out = np.flipud(image_gt)
+#     #Warp image to align with Diffuser: 
+#     image_gt_out = cv.warpAffine(image_gt_out, calib_data['M'], (image_gt_out.shape[1], image_gt_out.shape[0]))
     return image_diffuser_out, image_gt_out
 
 
@@ -476,7 +472,7 @@ def admm_rgb(model, in_vars, alpha2k_1, alpha2k_2, CtC, Cty, mu_auto, n, y):
 class Model(tf.keras.Model):
     def __init__(self, batch_size, h, iterations, learning_options = {'learned_vars': []}, 
                  init_vars = {'initialize_vars': False}):
-        super(Model, self).__init__()
+        super().__init__() #super(Model, self).__init__()
         
         self.iterations = iterations              # Number of unrolled iterations
         self.batch_size = batch_size              # Batch size 
@@ -683,7 +679,7 @@ class Model(tf.keras.Model):
         
 
         for i in range(0,self.iterations):
-
+            print(i, self.iterations)
             if 'network_denoiser' in self.learning_options['learned_vars']:
 
                 out_vars, _ , symm, admmstats= admm_rgb(self, in_vars[-1], i, CtC, Cty, [], i)
