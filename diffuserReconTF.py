@@ -84,8 +84,7 @@ def main():
         i = 1
         bar.start()
         for diffuser_batch, label_batch in dataset_test:
-            if i % 20 == 0:
-                print(i)
+            print(i)
             if i < start:
                 i += 1
                 continue

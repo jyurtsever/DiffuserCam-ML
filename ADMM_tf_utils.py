@@ -679,7 +679,7 @@ class Model(tf.keras.Model):
         
 
         for i in range(0,self.iterations):
-            # print(i, self.iterations)
+            print(i, self.iterations)
             if 'network_denoiser' in self.learning_options['learned_vars']:
 
                 out_vars, _ , symm, admmstats= admm_rgb(self, in_vars[-1], i, CtC, Cty, [], i)
