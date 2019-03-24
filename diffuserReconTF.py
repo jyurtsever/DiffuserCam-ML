@@ -84,7 +84,7 @@ def main():
         i = 1
         bar.start()
         for diffuser_batch, label_batch in dataset_test:
-            print(i)
+            # print(i)
             if i < start:
                 i += 1
                 continue
@@ -98,7 +98,7 @@ def main():
                 save_file_diffuser = save_path + 'im' + str(i) + '.tiff'
                 im = preplot(out_image[ind] / np.max(out_image[ind]))
                 scipy.misc.imsave(save_file_diffuser, im)
-            i += ind
+            i += ind + 1
         bar.finish()
 
 if __name__ == '__main__':
