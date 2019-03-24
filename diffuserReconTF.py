@@ -95,8 +95,7 @@ def main():
             labels = label_batch
             out_image, symm = model(inputs)
             for ind in range(test_batch_size):
-                save_file_diffuser = te_names[i]
-                print(save_file_diffuser)
+                save_file_diffuser = save_path + te_names[i]
                 im = preplot(out_image[ind] / np.max(out_image[ind]))
                 scipy.misc.imsave(save_file_diffuser, im)
                 i += 1
