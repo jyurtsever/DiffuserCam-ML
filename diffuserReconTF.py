@@ -81,7 +81,7 @@ def main():
     elif eager_enabled == True:
         bar = progressbar.ProgressBar(maxval=num_photos, \
                                       widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
-        i = 1
+        i = 0
         bar.start()
         for diffuser_batch, label_batch in dataset_test:
             # print(i)
@@ -96,7 +96,7 @@ def main():
             out_image, symm = model(inputs)
             for ind in range(test_batch_size):
                 save_file_diffuser = save_path + te_names[i]
-                im = preplot(out_image[ind] / np.max(out_image[ind]))
+                im = np.flipud(out_image[ind] / np.max(out_image[ind]))
                 scipy.misc.imsave(save_file_diffuser, im)
                 i += 1
         bar.finish()
