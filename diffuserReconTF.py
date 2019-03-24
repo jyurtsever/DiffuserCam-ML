@@ -90,7 +90,7 @@ def main():
                 continue
             if i > start + num_photos:
                 break
-            bar.update(i + 1)
+            bar.update(i)
             inputs = diffuser_batch
             labels = label_batch
             out_image, symm = model(inputs)
