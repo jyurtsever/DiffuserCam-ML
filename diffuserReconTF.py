@@ -81,9 +81,14 @@ def main():
     elif eager_enabled == True:
         bar = progressbar.ProgressBar(maxval=num_photos, \
                                       widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
-        i = 0
+        # i = start
+        print("loading")
+        d_test_lst = list(dataset_test)
+        print("loaded")
         bar.start()
-        for diffuser_batch, label_batch in dataset_test:
+        #for diffuser_batch, label_batch in dataset_test:
+        for i in range(start, len(d_test_lst)):
+            diffuser_batch, label_batch = d_test_lst[i]
             # print(i)
             if i < start:
                 i += 1
@@ -98,7 +103,7 @@ def main():
                 save_file_diffuser = save_path + te_names[i]
                 im = np.flipud(out_image[ind])# / np.max(out_image[ind]))
                 scipy.misc.imsave(save_file_diffuser, im)
-                i += 1
+                # i += 1
         bar.finish()
 
 if __name__ == '__main__':
