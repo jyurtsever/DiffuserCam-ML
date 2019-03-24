@@ -81,16 +81,16 @@ def main():
     elif eager_enabled == True:
         bar = progressbar.ProgressBar(maxval=num_photos, \
                                       widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
-        i = start
+        i = 0
         bar.start()
         for diffuser_batch, label_batch in dataset_test:
             # print(i)
             # if i < start:
             #     i += 1
             #     continue
-            if i > start + num_photos:
+            if i > num_photos:
                 break
-            bar.update(i - start)
+            bar.update(i)
             inputs = diffuser_batch
             labels = label_batch
             out_image, symm = model(inputs)
