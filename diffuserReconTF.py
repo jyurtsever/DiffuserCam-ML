@@ -84,6 +84,7 @@ def main():
         i = 1
         bar.start()
         for diffuser_batch, label_batch in dataset_test:
+            print(i)
             if i < start:
                 continue
             if i > start + num_photos:
