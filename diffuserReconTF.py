@@ -32,9 +32,9 @@ def main():
     train_batch_size = batch_size
     test_batch_size = batch_size
 
-    dataset_train, len_train_dataset = make_dataset(csv_file_path, opts['down_sizing']);
+    dataset_train, len_train_dataset, tr_names = make_dataset(csv_file_path, opts['down_sizing']);
 
-    dataset_test, len_test_dataset = make_dataset(csv_file_path_test, opts['down_sizing']);
+    dataset_test, len_test_dataset, te_names = make_dataset(csv_file_path_test, opts['down_sizing']);
 
     dataset_test = dataset_test.batch(batch_size=test_batch_size)
     dataset_train = dataset_train.batch(batch_size=train_batch_size)
@@ -95,10 +95,10 @@ def main():
             labels = label_batch
             out_image, symm = model(inputs)
             for ind in range(test_batch_size):
-                save_file_diffuser = save_path + 'im' + str(i) + '.tiff'
+                save_file_diffuser = te_names[i]
                 im = preplot(out_image[ind] / np.max(out_image[ind]))
                 scipy.misc.imsave(save_file_diffuser, im)
-            i += ind + 1
+                i += 1
         bar.finish()
 
 if __name__ == '__main__':

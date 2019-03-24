@@ -126,7 +126,7 @@ def make_dataset(csv_file, ds):
     
 
     
-    return dataset, len(csv_contents)
+    return dataset, len(csv_contents), filenames_diffuser
 
 def preplot(image):
     image_color = np.zeros_like(image); 
