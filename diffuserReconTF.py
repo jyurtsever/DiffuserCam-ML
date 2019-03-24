@@ -32,9 +32,9 @@ def main():
     train_batch_size = batch_size
     test_batch_size = batch_size
 
-    dataset_train, len_train_dataset, tr_names = make_dataset(csv_file_path, opts['down_sizing']);
+    dataset_train, len_train_dataset, tr_names = make_dataset(csv_file_path, opts['down_sizing'], start=start)
 
-    dataset_test, len_test_dataset, te_names = make_dataset(csv_file_path_test, opts['down_sizing']);
+    dataset_test, len_test_dataset, te_names = make_dataset(csv_file_path_test, opts['down_sizing'], start=start)
 
     dataset_test = dataset_test.batch(batch_size=test_batch_size)
     dataset_train = dataset_train.batch(batch_size=train_batch_size)
@@ -81,18 +81,13 @@ def main():
     elif eager_enabled == True:
         bar = progressbar.ProgressBar(maxval=num_photos, \
                                       widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
-        # i = start
-        print("loading")
-        d_test_lst = list(dataset_test)
-        print("loaded")
+        i = start
         bar.start()
-        #for diffuser_batch, label_batch in dataset_test:
-        for i in range(start, len(d_test_lst)):
-            diffuser_batch, label_batch = d_test_lst[i]
+        for diffuser_batch, label_batch in dataset_test:
             # print(i)
-            if i < start:
-                i += 1
-                continue
+            # if i < start:
+            #     i += 1
+            #     continue
             if i > start + num_photos:
                 break
             bar.update(i)
@@ -103,7 +98,7 @@ def main():
                 save_file_diffuser = save_path + te_names[i]
                 im = np.flipud(out_image[ind])# / np.max(out_image[ind]))
                 scipy.misc.imsave(save_file_diffuser, im)
-                # i += 1
+                i += 1
         bar.finish()
 
 if __name__ == '__main__':

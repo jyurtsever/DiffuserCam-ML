@@ -109,13 +109,13 @@ def _read_py_function(filename, filename_gt, ds):
     return image_diffuser_out, image_gt_out
 
 
-def make_dataset(csv_file, ds):
+def make_dataset(csv_file, ds, start=0):
     csv_contents = pd.read_csv(csv_file)
     
     filenames_diffuser = []
     filenames_gt = []
     filenames = []
-    for i in range(0,len(csv_contents)):
+    for i in range(start, len(csv_contents)):
         filenames_diffuser.append(csv_contents.iloc[i,0])
         filenames_gt.append(csv_contents.iloc[i,0])
         filenames.append(csv_contents.iloc[i,0])
