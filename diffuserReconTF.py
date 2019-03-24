@@ -131,6 +131,5 @@ if __name__ == '__main__':
     num_photos = int(sys.argv[1])
     num_iters = int(sys.argv[2])
     start = int(sys.argv[3])
-
-
+    main()
 
