@@ -17,7 +17,7 @@ from ADMM_tf_utils import *
 #from model_unrolled_layered import *
 
 # import model_color as my_model_color
-
+import progressbar
 import scipy
 import sys
 
@@ -79,12 +79,16 @@ def main():
 
 
     elif eager_enabled == True:
+        bar = progressbar.ProgressBar(maxval=num_photos, \
+                                      widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
         i = 1
+        bar.start()
         for diffuser_batch, label_batch in dataset_test:
             if i < start:
                 continue
             if i > start + num_photos:
                 break
+            bar.update(i + 1)
             inputs = diffuser_batch
             labels = label_batch
             out_image, symm = model(inputs)
@@ -92,8 +96,8 @@ def main():
                 save_file_diffuser = save_path + 'im' + str(i) + '.tiff'
                 im = preplot(out_image[ind] / np.max(out_image[ind]))
                 scipy.misc.imsave(save_file_diffuser, im)
-            i += 1
-
+            i += ind
+        bar.finish()
 
 if __name__ == '__main__':
     num_photos = int(sys.argv[1])
