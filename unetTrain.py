@@ -150,10 +150,8 @@ if __name__ == '__main__':
     args = CLI.parse_args()
 
     use_gpu = args.gpu != -1
-    # if use_gpu:
-        # print(torch.cuda.current_device())
-        # torch.cuda.set_device(args.gpu)
-        # print("CURRENT DEVICE: ", torch.cuda.current_device())
+    if use_gpu:
+        print("CURRENT DEVICE: ", torch.cuda.current_device(), "num_devices: ", torch.cuda.device_count())
     # data_dir = args.data_dir
     csv_path_test = args.gt_dir + 'test_names.csv'
     test_filenames = pd.read_csv(csv_path_test)
