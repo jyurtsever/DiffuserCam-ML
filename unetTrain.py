@@ -116,11 +116,11 @@ if __name__ == '__main__':
     use_gpu = torch.cuda.is_available()
     CLI = argparse.ArgumentParser()
     CLI.add_argument(
-        "recon_dir",  # name on the CLI - drop the `--` for positional/required parameters
+        "--recon_dir",  # name on the CLI - drop the `--` for positional/required parameters
         type=str,
     )
     CLI.add_argument(
-        "gt_dir",  # name on the CLI - drop the `--` for positional/required parameters
+        "--gt_dir",  # name on the CLI - drop the `--` for positional/required parameters
         type=str,
     )
 
@@ -137,7 +137,7 @@ if __name__ == '__main__':
     )
 
     CLI.add_argument(
-        "save_test_results",  # name on the CLI - drop the `--` for positional/required parameters
+        "--save_test_results",  # name on the CLI - drop the `--` for positional/required parameters
         type=str,
     )
     args = CLI.parse_args()
