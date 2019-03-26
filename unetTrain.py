@@ -138,8 +138,7 @@ if __name__ == '__main__':
 
     CLI.add_argument(
         "save_test_results",  # name on the CLI - drop the `--` for positional/required parameters
-        type=int,
-        default=str,  # default if nothing is provided
+        type=str,
     )
     args = CLI.parse_args()
 
