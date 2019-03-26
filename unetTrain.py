@@ -150,4 +150,4 @@ if __name__ == '__main__':
     gt_dir = args.gt_dir
     rec_dir = args.recon_dir
     BATCH_SIZE = int(args.batch_size)
-    model = unet_optimize(sys.argv)
+    model = unet_optimize(args)
