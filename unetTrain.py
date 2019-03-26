@@ -113,10 +113,8 @@ def unet_optimize(args):
     evaluate(model, loss_fn, test_loader)
 
 if __name__ == '__main__':
-    use_gpu = torch.cuda.is_available()
+    # use_gpu = torch.cuda.is_available()
     CLI = argparse.ArgumentParser()
-    if use_gpu:
-        print(torch.cuda.current_device())
     CLI.add_argument(
         "--recon_dir",  # name on the CLI - drop the `--` for positional/required parameters
         type=str,
@@ -142,9 +140,20 @@ if __name__ == '__main__':
         "--save_test_results",  # name on the CLI - drop the `--` for positional/required parameters
         type=str,
     )
+
+    CLI.add_argument(
+        "--gpu",  # name on the CLI - drop the `--` for positional/required parameters
+        type=int,
+        default=-1,  # default if nothing is provided
+    )
+
     args = CLI.parse_args()
 
-
+    use_gpu = args.gpu != -1
+    if use_gpu:
+        print(torch.cuda.current_device())
+        torch.cuda.set_device(args.gpu)
+        print("CURRENT DEVICE: ", torch.cuda.current_device())
     # data_dir = args.data_dir
     csv_path_test = args.gt_dir + 'test_names.csv'
     test_filenames = pd.read_csv(csv_path_test)
