@@ -115,6 +115,8 @@ def unet_optimize(args):
 if __name__ == '__main__':
     use_gpu = torch.cuda.is_available()
     CLI = argparse.ArgumentParser()
+    if use_gpu:
+        print(torch.cuda.current_device())
     CLI.add_argument(
         "--recon_dir",  # name on the CLI - drop the `--` for positional/required parameters
         type=str,
