@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import matplotlib.image as img
 import cv2
 import sys
+import argparse
 from reconNet import *
 from sklearn.model_selection import train_test_split
 from torch.autograd import Variable
@@ -24,7 +25,12 @@ from torch.utils.data import Dataset
 
 
 
-
+def torch_to_im(i, torch_mat):
+    dest_im = np.zeros((128,128,3))
+    dest_im[:, :, 0]= torch_mat[i,0,:,:]
+    dest_im[:, :, 1]= torch_mat[i,1,:,:]
+    dest_im[:, :, 2]= torch_mat[i,2,:,:]
+    dest_im /= np.max(dest_im)
 
 
 
@@ -48,20 +54,37 @@ def train(model, optimizer, loss_fn, train_loader, epoch):
 
 def evaluate(model, loss_fn, test_loader):
     output = None
-    for batch_idx, item in enumerate(test_loader):
-        X_batch, Y_batch = item['image'], item['label']
-        # print(X_batch.shape, "okkkkkk")
-        output = model(X_batch)
-        loss = loss_fn(output, Y_batch)
-        loss.backward()
-        print('[{}/{} ({:.0f}%)] \t Test Loss: {:.6f}'.format(
-            batch_idx*len(X_batch), len(test_loader.dataset), 100.*batch_idx / \
-                len(test_loader), loss.item()))
-    out = output.cpu().detach().numpy()
-    gt = Y_batch.cpu().numpy()
-    recon = X_batch.cpu().numpy()
-    save_dict = {'pred': out, 'gt': gt, 'recon': recon}
-    io.savemat('test.mat', save_dict)
+    i = 0
+    with torch.no_grad():
+        for batch_idx, item in enumerate(test_loader):
+            X_batch, Y_batch = item['image'], item['label']
+            # print(X_batch.shape, "okkkkkk")
+            output = model(X_batch)
+            loss = loss_fn(output, Y_batch)
+            # loss.backward()
+
+            print('[{}/{} ({:.0f}%)] \t Test Loss: {:.6f}'.format(
+                batch_idx*len(X_batch), len(test_loader.dataset), 100.*batch_idx / \
+                    len(test_loader), loss.item()))
+            out = output.cpu().detach().numpy()
+            gt = Y_batch.cpu().numpy()
+            recon = X_batch.cpu().numpy()
+            for j in range(out.shape[0]):
+                curr_out = torch_to_im(j, out)
+                curr_gt = torch_to_im(j, gt)
+                curr_recon = torch_to_im(j, gt)
+                im_name = test_filenames[i]
+                out_name = args.save_test_results + '/out/' + im_name
+                gt_name = args.save_test_results + '/gt/' + im_name
+                recon_name = args.save_test_results + '/recon/' + im_name
+                scm.misc.imsave(out_name, curr_out)
+                scm.misc.imsave(gt_name, curr_gt)
+                scm.misc.imsave(recon_name, curr_recon)
+                i += 1
+
+
+        save_dict = {'pred': out, 'gt': gt, 'recon': recon}
+        io.savemat('test.mat', save_dict)
 
 def run_train(model, optimizer, loss_fn, train_loader, num_epochs):
     for epoch in range(num_epochs):
@@ -88,15 +111,42 @@ def unet_optimize(args):
         model = model.cuda()
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters())
-    run_train(model, optimizer, loss_fn, train_loader, int(args[2]))
+    run_train(model, optimizer, loss_fn, train_loader, int(args.num_epochs))
     evaluate(model, loss_fn, test_loader)
 
 if __name__ == '__main__':
-    data_dir = sys.argv[1]
+    use_gpu = torch.cuda.is_available()
+    CLI = argparse.ArgumentParser()
+    CLI.add_argument(
+        "data_dir",  # name on the CLI - drop the `--` for positional/required parameters
+        type=int,
+    )
+
+    CLI.add_argument(
+        "--num_epochs",  # name on the CLI - drop the `--` for positional/required parameters
+        type=int,
+        default= 5,  # default if nothing is provided
+    )
+
+    CLI.add_argument(
+        "--batch_size",  # name on the CLI - drop the `--` for positional/required parameters
+        type=int,
+        default=4,  # default if nothing is provided
+    )
+
+    CLI.add_argument(
+        "save_test_results",  # name on the CLI - drop the `--` for positional/required parameters
+        type=int,
+        default=4,  # default if nothing is provided
+    )
+    args = CLI.parse_args()
+
+
+    data_dir = args.data_dir
     csv_path_test = data_dir + 'test_names.csv'
+    test_filenames = pd.read_csv(csv_path_test)
     csv_path_train = data_dir + 'train_names.csv'
     gt_dir = data_dir + 'gt'
     rec_dir = data_dir + 'recon'
-    use_gpu = sys.argv[3] == 'gpu'
-    BATCH_SIZE = int(sys.argv[4])
+    BATCH_SIZE = int(args.batch_size)
     model = unet_optimize(sys.argv)
