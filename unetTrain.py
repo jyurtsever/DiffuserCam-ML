@@ -26,7 +26,7 @@ from torch.utils.data import Dataset
 
 
 def torch_to_im(i, torch_mat):
-    dest_im = np.zeros((128,128,3))
+    dest_im = np.zeros((270,480,3))
     dest_im[:, :, 0]= torch_mat[i,0,:,:]
     dest_im[:, :, 1]= torch_mat[i,1,:,:]
     dest_im[:, :, 2]= torch_mat[i,2,:,:]
