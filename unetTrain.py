@@ -47,7 +47,7 @@ def train(model, optimizer, loss_fn, train_loader, epoch):
         loss = loss_fn(output, Y_batch)
         loss.backward()
         optimizer.step()
-        if batch_idx % 2 == 0:
+        if batch_idx % 20 == 0:
             print('Epoch : {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx*len(X_batch), len(train_loader.dataset), 100.*batch_idx / \
                 len(train_loader), loss.item()))
