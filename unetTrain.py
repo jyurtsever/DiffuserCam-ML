@@ -117,11 +117,11 @@ if __name__ == '__main__':
     CLI = argparse.ArgumentParser()
     CLI.add_argument(
         "recon_dir",  # name on the CLI - drop the `--` for positional/required parameters
-        type=int,
+        type=str,
     )
     CLI.add_argument(
         "gt_dir",  # name on the CLI - drop the `--` for positional/required parameters
-        type=int,
+        type=str,
     )
 
     CLI.add_argument(
@@ -139,7 +139,7 @@ if __name__ == '__main__':
     CLI.add_argument(
         "save_test_results",  # name on the CLI - drop the `--` for positional/required parameters
         type=int,
-        default=4,  # default if nothing is provided
+        default=str,  # default if nothing is provided
     )
     args = CLI.parse_args()
 
