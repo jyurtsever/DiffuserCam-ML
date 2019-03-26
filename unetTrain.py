@@ -116,7 +116,11 @@ if __name__ == '__main__':
     use_gpu = torch.cuda.is_available()
     CLI = argparse.ArgumentParser()
     CLI.add_argument(
-        "data_dir",  # name on the CLI - drop the `--` for positional/required parameters
+        "recon_dir",  # name on the CLI - drop the `--` for positional/required parameters
+        type=int,
+    )
+    CLI.add_argument(
+        "gt_dir",  # name on the CLI - drop the `--` for positional/required parameters
         type=int,
     )
 
@@ -140,11 +144,11 @@ if __name__ == '__main__':
     args = CLI.parse_args()
 
 
-    data_dir = args.data_dir
-    csv_path_test = data_dir + 'test_names.csv'
+    # data_dir = args.data_dir
+    csv_path_test = args.gt_dir + 'test_names.csv'
     test_filenames = pd.read_csv(csv_path_test)
-    csv_path_train = data_dir + 'train_names.csv'
-    gt_dir = data_dir + 'gt'
-    rec_dir = data_dir + 'recon'
+    csv_path_train = args.gt_dir + 'train_names.csv'
+    gt_dir = args.gt_dir
+    rec_dir = args.recon_dir
     BATCH_SIZE = int(args.batch_size)
     model = unet_optimize(sys.argv)
