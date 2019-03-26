@@ -81,10 +81,8 @@ def evaluate(model, loss_fn, test_loader):
                 scm.misc.imsave(gt_name, curr_gt)
                 scm.misc.imsave(recon_name, curr_recon)
                 i += 1
-
-
-        save_dict = {'pred': out, 'gt': gt, 'recon': recon}
-        io.savemat('test.mat', save_dict)
+        # save_dict = {'pred': out, 'gt': gt, 'recon': recon}
+        # io.savemat('test.mat', save_dict)
 
 def run_train(model, optimizer, loss_fn, train_loader, num_epochs):
     for epoch in range(num_epochs):
@@ -93,7 +91,7 @@ def run_train(model, optimizer, loss_fn, train_loader, num_epochs):
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
-        }, "saved_network.pt")
+        }, args.save_test_results + "/saved_network.pt")
 
 def unet_optimize(args):
     transformations = transforms.Compose([transforms.ToTensor()])
