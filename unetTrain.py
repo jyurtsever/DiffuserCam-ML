@@ -57,8 +57,8 @@ def evaluate(model, loss_fn, test_loader):
     output = None
     i = 0
     with torch.no_grad():
+        try:
             for batch_idx, item in enumerate(test_loader):
-                try:
                     X_batch, Y_batch = item['image'], item['label']
                     # print(X_batch.shape, "okkkkkk")
                     output = model(X_batch)
@@ -83,8 +83,8 @@ def evaluate(model, loss_fn, test_loader):
                         # scm.imsave(gt_name, curr_gt)
                         scm.imsave(recon_name, curr_recon)
                         i += 1
-                except AttributeError:
-                    break
+        except AttributeError as e:
+            print("stopped at batch_idx: ", batch_idx)
         # save_dict = {'pred': out, 'gt': gt, 'recon': recon}
         # io.savemat('test.mat', save_dict)
 
