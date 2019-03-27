@@ -73,7 +73,8 @@ def evaluate(model, loss_fn, test_loader):
                 curr_out = torch_to_im(j, out)
                 curr_gt = torch_to_im(j, gt)
                 curr_recon = torch_to_im(j, gt)
-                im_name = test_filenames[i]
+                im_name = test_filenames[:, i]
+                print(im_name)
                 out_name = args.save_test_results + '/out/' + im_name
                 gt_name = args.save_test_results + '/gt/' + im_name
                 recon_name = args.save_test_results + '/recon/' + im_name
