@@ -31,6 +31,7 @@ def torch_to_im(i, torch_mat):
     dest_im[:, :, 1]= torch_mat[i,1,:,:]
     dest_im[:, :, 2]= torch_mat[i,2,:,:]
     dest_im /= np.max(dest_im)
+    return dest_im
 
 
 
