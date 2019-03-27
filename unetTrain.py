@@ -78,9 +78,9 @@ def evaluate(model, loss_fn, test_loader):
                 out_name = args.save_test_results + '/out/' + im_name
                 gt_name = args.save_test_results + '/gt/' + im_name
                 recon_name = args.save_test_results + '/recon/' + im_name
-                scm.misc.imsave(out_name, curr_out)
-                scm.misc.imsave(gt_name, curr_gt)
-                scm.misc.imsave(recon_name, curr_recon)
+                scm.imsave(out_name, curr_out)
+                scm.imsave(gt_name, curr_gt)
+                scm.imsave(recon_name, curr_recon)
                 i += 1
         # save_dict = {'pred': out, 'gt': gt, 'recon': recon}
         # io.savemat('test.mat', save_dict)
