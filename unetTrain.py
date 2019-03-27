@@ -72,16 +72,16 @@ def evaluate(model, loss_fn, test_loader):
                     # gt = Y_batch.cpu().numpy()
                     recon = X_batch.cpu().numpy()
                     for j in range(out.shape[0]):
-                            curr_out = torch_to_im(j, out)
-                            # curr_gt = torch_to_im(j, gt)
-                            curr_recon = torch_to_im(j, recon)
-                            im_name = test_filenames.iloc[i, 0]
-                            out_name = args.save_test_results + '/out/' + im_name
-                            # gt_name = args.save_test_results + '/gt/' + im_name
-                            recon_name = args.save_test_results + '/recon/' + im_name
-                            scm.imsave(out_name, curr_out)
-                            # scm.imsave(gt_name, curr_gt)
-                            scm.imsave(recon_name, curr_recon)
+                        curr_out = torch_to_im(j, out)
+                        # curr_gt = torch_to_im(j, gt)
+                        curr_recon = torch_to_im(j, recon)
+                        im_name = test_filenames.iloc[i, 0]
+                        out_name = args.save_test_results + '/out/' + im_name
+                        # gt_name = args.save_test_results + '/gt/' + im_name
+                        recon_name = args.save_test_results + '/recon/' + im_name
+                        scm.imsave(out_name, curr_out)
+                        # scm.imsave(gt_name, curr_gt)
+                        scm.imsave(recon_name, curr_recon)
                         i += 1
                 except AttributeError:
                     break
