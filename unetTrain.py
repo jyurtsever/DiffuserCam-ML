@@ -113,7 +113,7 @@ def unet_optimize(args):
         model = model.cuda()
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters())
-    run_train(model, optimizer, loss_fn, train_loader, int(args.num_epochs))
+#    run_train(model, optimizer, loss_fn, train_loader, int(args.num_epochs))
     evaluate(model, loss_fn, test_loader)
 
 if __name__ == '__main__':
