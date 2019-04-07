@@ -5,6 +5,7 @@ import torch.nn.functional as F
 import torch.utils.data as torchdata
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
+import PerceptualSimilarity as ps
 import pandas as pd
 import numpy as np
 import scipy.io as io
@@ -46,12 +47,12 @@ def train(model, optimizer, loss_fn, train_loader, epoch):
         # plt.show()
         output = model(X_batch)
         loss = loss_fn(output, Y_batch)
-        loss.backward()
+        loss.sum().backward()#loss.backward()
         optimizer.step()
         if batch_idx % 20 == 0:
             print('Epoch : {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx*len(X_batch), len(train_loader.dataset), 100.*batch_idx / \
-                len(train_loader), loss.item()))
+                len(train_loader), loss.sum().item()))
 
 def evaluate(model, loss_fn, test_loader):
     output = None
@@ -67,7 +68,7 @@ def evaluate(model, loss_fn, test_loader):
 
                     print('[{}/{} ({:.0f}%)] \t Test Loss: {:.6f}'.format(
                         batch_idx*len(X_batch), len(test_loader.dataset), 100.*batch_idx / \
-                            len(test_loader), loss.item()))
+                            len(test_loader), loss.sum().item()))
                     out = output.cpu().detach().numpy()
                     # gt = Y_batch.cpu().numpy()
                     recon = X_batch.cpu().numpy()
@@ -111,7 +112,7 @@ def unet_optimize(args):
     model = UNet512512((3, 128, 128))
     if use_gpu:
         model = model.cuda()
-    loss_fn = nn.MSELoss()
+    loss_fn = ps.PerceptualLoss().forward #nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters())
     run_train(model, optimizer, loss_fn, train_loader, int(args.num_epochs))
     evaluate(model, loss_fn, test_loader)
