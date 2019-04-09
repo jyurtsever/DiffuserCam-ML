@@ -14,18 +14,21 @@ import sys, os
 
 ####        INITIALIZE        #####
 def initialize(image_file, psf_file, f_lat = 1, f_ax = 1, type = 'pco', color = 'rgb', dim = '2d', ind = 0):
-    try:
-        im_type = image_file[-3:]
-        psf_type = psf_file[-3:]
-        # image = np.array(np.load(image_file))
-        # psf = np.array(np.load(psf_file))
-        # image = np.array(Image.open(image_file))[:,:,ind].astype('float32')
+    
+    im_type = image_file[-3:]
+    psf_type = psf_file[-3:]
+    # image = np.array(np.load(image_file))
+    # psf = np.array(np.load(psf_file))
+    # image = np.array(Image.open(image_file))[:,:,ind].astype('float32')
+    print(im_type)
+    if im_type == 'mat':
+        image = scipy.io.loadmat(image_file)['image'][:,:,ind].astype('float32')
+    else:
+        print(image_file)
         image = np.array(cv2.imread(image_file ,-1))[: ,: ,ind].astype('float32')
 
-        psf = io.loadmat(psf_file)['psf'] if psf_type == 'mat' else rgb2gray \
-            (np.array(cv2.imread(psf_file ,-1)).astype('float32'))
-    except IOError as ex:
-        print("I/O error: " + str(ex.strerror))
+    psf = io.loadmat(psf_file)['psf'] if psf_type == 'mat' else rgb2gray \
+        (np.array(cv2.imread(psf_file ,-1)).astype('float32'))
     if dim == '2d':  # embed into a 3d array
         psf = np.expand_dims(psf, 2)
     psf_bg = np.mean(psf[0 : 15, 0 : 15])  # 102
@@ -110,10 +113,12 @@ def reconstruct_and_save(image_file, gt_file, save_file_diffuser, save_file_crop
 #####  ITERATES THROUGH
 def run_recon_and_crop(num_photos, max_itr, im_path, gt_path, save_path, start=1):
     for i in range(start, start + num_photos):
-        enablePrint()
+        # enablePrint()
         print('photo ', i, ' of ', num_photos + start, '\n\n', end="\r")
-        blockPrint()
-        im_file = im_path + 'im' + str(i) + '.jpg.tiff'
+        if sys.argv[5] == 'mat': 
+            im_file = im_path + 'face' + str(i) + '.mat'
+        else:
+            im_file = im_path + 'im' + str(i) + '.jpg.tiff'
         gt_file = gt_path + 'im' + str(i) + '.jpg.tiff'
         save_file_diffuser = None #save_path + 'recon/im' + str(i) + '.tiff'
         crp_path = save_path + 'im' + str(i) + '.tiff'
@@ -123,9 +128,9 @@ def run_recon_and_crop(num_photos, max_itr, im_path, gt_path, save_path, start=1
 
 def run_recon_and_crop_gt(num_photos, gt_path, save_path, start=1):
     for i in range(start, start + num_photos):
-        enablePrint()
+        #enablePrint()
         print('photo ', i, ' of ', num_photos + start, '\n\n', end="\r")
-        blockPrint()
+        #blockPrint()
         gt_file = gt_path + 'im' + str(i) + '.jpg.tiff'
         save_file_gt = save_path + 'gt/im' + str(i) + '.tiff'
         transform_and_save_gt(gt_file, save_file_gt)
@@ -153,8 +158,8 @@ if __name__ == '__main__':
     bg_image = np.array(cv2.imread(bg_file, -1)).astype('float32')
 
     #####   Diffuser Image     #####
-    image_file = '../mirflickr25k/diffuser_raw/im333.jpg.tiff'
-    im_path = '../mirflickr25k/diffuser_raw/'
+    image_file = '../Spring2019_portraits/diffuser_raw/face2.mat'
+    im_path = '../Spring2019_portraits/diffuser_raw/'
 
     #####    GT IMAGE     #####
     gt_path = '../mirflickr25k/gt'
