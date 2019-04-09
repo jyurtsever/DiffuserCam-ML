@@ -13,7 +13,7 @@ def preplot(image):
     return out_image
 
 
-def save_model_summary(model, test_loader):
+def save_model_summary(model, test_loader, args):
    device = torch.cuda.current_device()
    model = model.to(device)
 
@@ -23,10 +23,11 @@ def save_model_summary(model, test_loader):
    loss_dict['time_gpu'] = time_gpu
    loss_dict['time_cpu'] = time_cpu
 
-   loss_dict['filename'] = 'admm_5iter_mseloss2.pt'
-   loss_dict['description'] = 'ADMM, muand tau, 5 iterations, tau init 0.0002, 25 epochs, small dataset (100)'
+   loss_dict['filename'] = args.filename
+   loss_dict['description'] = 'ADMM, muand tau,' +  args.n_iters + ' iterations, tau init 0.0002 ' + \
+                               args.num_epochs + ' epochs, ' + args.dataset_len + ' dataset (23000)'
 
-   save_filename = ('saved_models/saved_stats/'+loss_dict['filename'])[0:-3]
+   save_filename = ('../saved_models/saved_stats/'+loss_dict['filename'])
 
    print('\r', 'Saving as:', save_filename, end = '')
    scipy.io.savemat(save_filename, loss_dict)

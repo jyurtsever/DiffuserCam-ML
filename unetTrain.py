@@ -86,6 +86,8 @@ def evaluate(model, loss_fn, test_loader):
                         i += 1
         except AttributeError as e:
             print("stopped at batch_idx: ", batch_idx)
+    print("Running Kristinas's code")
+    save_model_summary(model, test_loader, args)
         # save_dict = {'pred': out, 'gt': gt, 'recon': recon}
         # io.savemat('test.mat', save_dict)
 
@@ -144,6 +146,21 @@ if __name__ == '__main__':
     CLI.add_argument(
         "--save_test_results",  # name on the CLI - drop the `--` for positional/required parameters
         type=str,
+    )
+
+    CLI.add_argument(
+        "--filename",  # name on the CLI - drop the `--` for positional/required parameters
+        type=str,
+    )
+
+    CLI.add_argument(
+        "--n_iters",  # name on the CLI - drop the `--` for positional/required parameters
+        type=str,
+    )
+
+    CLI.add_argument(
+
+
     )
 
     CLI.add_argument(
