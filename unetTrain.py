@@ -157,6 +157,11 @@ if __name__ == '__main__':
     #     "--filename",  # name on the CLI - drop the `--` for positional/required parameters
     #     type=str,
     # )
+    CLI.add_argument(
+        "--loss_fn",  # name on the CLI - drop the `--` for positional/required parameters
+        type=str,
+        default='lpips'
+    )
 
     CLI.add_argument(
         "--n_iters",  # name on the CLI - drop the `--` for positional/required parameters
