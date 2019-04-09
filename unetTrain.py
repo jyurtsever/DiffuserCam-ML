@@ -143,15 +143,15 @@ if __name__ == '__main__':
         default=4,  # default if nothing is provided
     )
 
-    CLI.add_argument(
-        "--save_test_results",  # name on the CLI - drop the `--` for positional/required parameters
-        type=str,
-    )
+    # CLI.add_argument(
+    #     "--save_test_results",  # name on the CLI - drop the `--` for positional/required parameters
+    #     type=str,
+    # )
 
-    CLI.add_argument(
-        "--filename",  # name on the CLI - drop the `--` for positional/required parameters
-        type=str,
-    )
+    # CLI.add_argument(
+    #     "--filename",  # name on the CLI - drop the `--` for positional/required parameters
+    #     type=str,
+    # )
 
     CLI.add_argument(
         "--n_iters",  # name on the CLI - drop the `--` for positional/required parameters
@@ -159,8 +159,9 @@ if __name__ == '__main__':
     )
 
     CLI.add_argument(
-
-
+        "--dset_size",
+        type=str,
+        default='big',
     )
 
     CLI.add_argument(
@@ -169,15 +170,31 @@ if __name__ == '__main__':
         default=-1,  # default if nothing is provided
     )
 
+    CLI.add_argument(
+        "--net",
+        type=str,
+        default='UNet512'
+    )
+
     args = CLI.parse_args()
 
+    dir_name = 'net_' + args.net + '_ADMM_' + args.n_iters + '_dset_size_' + args.dset_size + '_loss_' + args.loss_fn
+    save_path = '../saved_models/' + dir_name + '/'
+    os.mkdir(save_path); os.mkdir(save_path + 'gt/'); os.mkdir(save_path + 'out/'); os.mkdir(save_path + 'recon/')
     # use_gpu = args.gpu != -1
     # if use_gpu:
     #     print("CURRENT DEVICE: ", torch.cuda.current_device(), "num_devices: ", torch.cuda.device_count())
     # data_dir = args.data_dir
-    csv_path_test = args.gt_dir + 'test_names.csv'
-    test_filenames = pd.read_csv(csv_path_test)
-    csv_path_train = args.gt_dir + 'train_names.csv'
+    if args.dset_size == 'big':
+        csv_path_test = '../saved_models/dataset_12_12.csv'
+        test_filenames = pd.read_csv(csv_path_test)
+        csv_path_train = '../saved_models/dataset_12_12_test.csv'
+    elif args.dset_size == 'short':
+        csv_path_test = '../saved_models/dataset_12_12_short.csv'
+        test_filenames = pd.read_csv(csv_path_test)
+        csv_path_train = '../saved_models/dataset_12_12_test_small.csv'
+    else:
+        raise IOError("Dataset size not recognized")
     gt_dir = args.gt_dir
     rec_dir = args.recon_dir
     BATCH_SIZE = int(args.batch_size)
