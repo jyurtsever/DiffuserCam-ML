@@ -37,22 +37,22 @@ def torch_to_im(i, torch_mat):
 
 
 def train(model, optimizer, loss_fn, train_loader, epoch):
-    for batch_idx, item in enumerate(train_loader):
-        X_batch, Y_batch = item['image'], item['label']
-        optimizer.zero_grad()
-        # print(X_batch.shape, "okkkkkk")
-        # plt.imshow(Y_batch[1, 1, :,:].numpy())
-        # plt.show()
-        # plt.imshow(X_batch[1, 1, :, :].numpy())
-        # plt.show()
-        output = model(X_batch)
-        loss = loss_fn(output, Y_batch)
-        loss.sum().backward()#loss.backward()
-        optimizer.step()
-        if batch_idx % 20 == 0:
-            print('Epoch : {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx*len(X_batch), len(train_loader.dataset), 100.*batch_idx / \
-                len(train_loader), loss.sum().item()))
+    # for batch_idx, item in enumerate(train_loader):
+    #     X_batch, Y_batch = item['image'], item['label']
+    #     optimizer.zero_grad()
+    #     # print(X_batch.shape, "okkkkkk")
+    #     # plt.imshow(Y_batch[1, 1, :,:].numpy())
+    #     # plt.show()
+    #     # plt.imshow(X_batch[1, 1, :, :].numpy())
+    #     # plt.show()
+    #     output = model(X_batch)
+    #     loss = loss_fn(output, Y_batch)
+    #     loss.sum().backward()#loss.backward()
+    #     optimizer.step()
+    #     if batch_idx % 20 == 0:
+    #         print('Epoch : {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+    #             epoch, batch_idx*len(X_batch), len(train_loader.dataset), 100.*batch_idx / \
+    #             len(train_loader), loss.sum().item()))
 
 def evaluate(model, loss_fn, test_loader):
     output = None
@@ -110,8 +110,12 @@ def unet_optimize(args):
     # test_set = datasets.ImageFolder(csv_path_test, transform=transformations)
     train_loader = torchdata.DataLoader(train_set, batch_size = BATCH_SIZE, shuffle = False)
     test_loader = torchdata.DataLoader(test_set, batch_size = BATCH_SIZE, shuffle = False)
-
-    model = UNet512512((3, 128, 128))
+    if args.net == 'UNet512':
+        model = UNet512512((3, 128, 128))
+    elif args.net == 'UNet256':
+        model = UNet256256((3, 128, 128))
+    else:
+        raise IOError('Unrecognized net')
     if use_gpu:
         model = model.cuda()
     loss_fn = ps.PerceptualLoss().forward #nn.MSELoss()
