@@ -37,6 +37,7 @@ def torch_to_im(i, torch_mat):
 
 
 def train(model, optimizer, loss_fn, train_loader, epoch):
+    pass
     # for batch_idx, item in enumerate(train_loader):
     #     X_batch, Y_batch = item['image'], item['label']
     #     optimizer.zero_grad()
