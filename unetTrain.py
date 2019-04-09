@@ -78,9 +78,9 @@ def evaluate(model, loss_fn, test_loader):
                         # curr_gt = torch_to_im(j, gt)
                         curr_recon = torch_to_im(j, recon)
                         im_name = test_filenames.iloc[i, 0]
-                        out_name = args.save_test_results + '/out/' + im_name
-                        # gt_name = args.save_test_results + '/gt/' + im_name
-                        recon_name = args.save_test_results + '/recon/' + im_name
+                        out_name = save_path + '/out/' + im_name
+                        # gt_name = save_path + '/gt/' + im_name
+                        recon_name = save_path + '/recon/' + im_name
                         scm.imsave(out_name, curr_out)
                         # scm.imsave(gt_name, curr_gt)
                         scm.imsave(recon_name, curr_recon)
@@ -99,7 +99,7 @@ def run_train(model, optimizer, loss_fn, train_loader, num_epochs):
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
-        }, args.save_test_results + "/saved_network.pt")
+        }, save_path + "/saved_network.pt")
 
 def unet_optimize(args):
     transformations = transforms.Compose([transforms.ToTensor()])
