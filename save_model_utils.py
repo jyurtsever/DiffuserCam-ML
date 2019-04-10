@@ -71,7 +71,7 @@ def test_training_images(model, test_loader, device):
        print([l.shape for l in loss_dict['lpips']])
        loss_dict['mse_avg'] = np.average(loss_dict['mse']).squeeze()
        loss_dict['psnr_avg'] = np.average(loss_dict['psnr']).squeeze()
-       loss_dict['lpips_avg'] = np.average(loss_dict['lpips']).squeeze()
+       loss_dict['lpips_avg'] = np.average(loss_dict['lpips'][:-1]).squeeze()
        print('\r', 'avg mse:', loss_dict['mse_avg'], 'avg psnr:', loss_dict['psnr_avg'], 'avg lpips:', loss_dict['lpips_avg'])
 
 
