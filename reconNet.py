@@ -280,10 +280,10 @@ class UNet256256(nn.Module):
         down2, out = self.down2(out)
         down3, out = self.down3(out)
         down4, out = self.down4(out)
-        down5, out = self.down5(out)
+        # down5, out = self.down5(out)
 
         out = self.center(out)
-        out = self.up5(out, down5)
+        # out = self.up5(out, down5)
         out = self.up4(out, down4)
         out = self.up3(out, down3)
         out = self.up2(out, down2)

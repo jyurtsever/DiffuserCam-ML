@@ -116,8 +116,9 @@ def unet_optimize(args):
         model = UNet512512((3, 128, 128))
     elif args.net == 'UNet256':
         model = UNet256256((3, 128, 128))
+        print('Using unet256')
     else:
-        raise IOError('Unrecognized net')
+        raise IOError('ERROR: Unrecognized net')
     if use_gpu:
         model = model.cuda()
     loss_fn = ps.PerceptualLoss().forward #nn.MSELoss()
