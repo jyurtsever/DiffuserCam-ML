@@ -68,7 +68,7 @@ def test_training_images(model, test_loader, device):
            if i_batch == 63:
                loss_dict['sample_image'] = preplot(output.detach().cpu().numpy()[0])
 
-       print(loss_dict['lpips'].shape)
+       print([l.shape for l in loss_dict['lpips']])
        loss_dict['mse_avg'] = np.average(loss_dict['mse']).squeeze()
        loss_dict['psnr_avg'] = np.average(loss_dict['psnr']).squeeze()
        loss_dict['lpips_avg'] = np.average(loss_dict['lpips']).squeeze()
