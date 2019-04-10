@@ -96,6 +96,7 @@ def main():
             out_image, symm = model(inputs)
             for ind in range(test_batch_size):
                 save_file_diffuser = save_path + te_names[i]
+                print(save_file_diffuser)
                 im = np.flipud(out_image[ind])# / np.max(out_image[ind]))
                 scipy.misc.imsave(save_file_diffuser, im)
                 i += 1
