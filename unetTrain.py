@@ -38,55 +38,56 @@ def torch_to_im(i, torch_mat):
 
 def train(model, optimizer, loss_fn, train_loader, epoch):
     pass
-    # for batch_idx, item in enumerate(train_loader):
-    #     X_batch, Y_batch = item['image'], item['label']
-    #     optimizer.zero_grad()
-    #     # print(X_batch.shape, "okkkkkk")
-    #     # plt.imshow(Y_batch[1, 1, :,:].numpy())
-    #     # plt.show()
-    #     # plt.imshow(X_batch[1, 1, :, :].numpy())
-    #     # plt.show()
-    #     output = model(X_batch)
-    #     loss = loss_fn(output, Y_batch)
-    #     loss.sum().backward()#loss.backward()
-    #     optimizer.step()
-    #     if batch_idx % 20 == 0:
-    #         print('Epoch : {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-    #             epoch, batch_idx*len(X_batch), len(train_loader.dataset), 100.*batch_idx / \
-    #             len(train_loader), loss.sum().item()))
+    for batch_idx, item in enumerate(train_loader):
+        X_batch, Y_batch = item['image'], item['label']
+        optimizer.zero_grad()
+        # print(X_batch.shape, "okkkkkk")
+        # plt.imshow(Y_batch[1, 1, :,:].numpy())
+        # plt.show()
+        # plt.imshow(X_batch[1, 1, :, :].numpy())
+        # plt.show()
+        output = model(X_batch)
+        loss = loss_fn(output, Y_batch)
+        loss.sum().backward()#loss.backward()
+        optimizer.step()
+        if batch_idx % 20 == 0:
+            print('Epoch : {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                epoch, batch_idx*len(X_batch), len(train_loader.dataset), 100.*batch_idx / \
+                len(train_loader), loss.sum().item()))
 
 def evaluate(model, loss_fn, test_loader):
-    # output = None
-    # i = 0
-    # with torch.no_grad():
-    #     try:
-    #         for batch_idx, item in enumerate(test_loader):
-    #                 X_batch, Y_batch = item['image'], item['label']
-    #                 # print(X_batch.shape, "okkkkkk")
-    #                 output = model(X_batch)
-    #                 loss = loss_fn(output, Y_batch)
-    #                 # loss.backward()
-    #
-    #                 print('[{}/{} ({:.0f}%)] \t Test Loss: {:.6f}'.format(
-    #                     batch_idx*len(X_batch), len(test_loader.dataset), 100.*batch_idx / \
-    #                         len(test_loader), loss.sum().item()))
-    #                 out = output.cpu().detach().numpy()
-    #                 # gt = Y_batch.cpu().numpy()
-    #                 recon = X_batch.cpu().numpy()
-    #                 for j in range(out.shape[0]):
-    #                     curr_out = torch_to_im(j, out)
-    #                     # curr_gt = torch_to_im(j, gt)
-    #                     curr_recon = torch_to_im(j, recon)
-    #                     im_name = test_filenames.iloc[i, 0]
-    #                     out_name = save_path + '/out/' + im_name
-    #                     # gt_name = save_path + '/gt/' + im_name
-    #                     recon_name = save_path + '/recon/' + im_name
-    #                     scm.imsave(out_name, curr_out)
-    #                     # scm.imsave(gt_name, curr_gt)
-    #                     scm.imsave(recon_name, curr_recon)
-    #                     i += 1
-    #     except AttributeError as e:
-    #         print("stopped at batch_idx: ", batch_idx)
+    output = None
+    i = 0
+    with torch.no_grad():
+        try:
+            for batch_idx, item in enumerate(test_loader):
+                    X_batch, Y_batch = item['image'], item['label']
+                    # print(X_batch.shape, "okkkkkk")
+                    output = model(X_batch)
+                    loss = loss_fn(output, Y_batch)
+                    # loss.backward()
+
+                    print('[{}/{} ({:.0f}%)] \t Test Loss: {:.6f}'.format(
+                        batch_idx*len(X_batch), len(test_loader.dataset), 100.*batch_idx / \
+                            len(test_loader), loss.sum().item()))
+                    if batch_idx < 7:
+                        out = output.cpu().detach().numpy()
+                        # gt = Y_batch.cpu().numpy()
+                        recon = X_batch.cpu().numpy()
+                        for j in range(out.shape[0]):
+                            curr_out = torch_to_im(j, out)
+                            # curr_gt = torch_to_im(j, gt)
+                            curr_recon = torch_to_im(j, recon)
+                            im_name = test_filenames.iloc[i, 0]
+                            out_name = save_path + '/out/' + im_name
+                            # gt_name = save_path + '/gt/' + im_name
+                            recon_name = save_path + '/recon/' + im_name
+                            scm.imsave(out_name, curr_out)
+                            # scm.imsave(gt_name, curr_gt)
+                            scm.imsave(recon_name, curr_recon)
+                            i += 1
+        except AttributeError as e:
+            print("stopped at batch_idx: ", batch_idx)
     print("Running Kristinas's code")
     save_model_summary(model, test_loader, args)
         # save_dict = {'pred': out, 'gt': gt, 'recon': recon}
