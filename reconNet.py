@@ -272,7 +272,7 @@ class UNet256256(nn.Module):
         self.up1 = StackDecoder(24, 24, 24, kernel_size=3)  # 512
         self.classify = nn.Conv2d(24, 3, kernel_size=1, bias=True)
 
-        self.center = nn.Sequential(ConvBnRelu2d(512, 512, kernel_size=3, padding=1))
+        self.center = nn.Sequential(ConvBnRelu2d(256, 256, kernel_size=3, padding=1))
 
     def forward(self, x):
         out = x
