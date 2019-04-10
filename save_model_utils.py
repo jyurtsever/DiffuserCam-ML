@@ -25,8 +25,8 @@ def save_model_summary(model, test_loader, args):
 
    loss_dict['filename'] = 'net_' + args.net + '_ADMM_' + args.n_iters + '_dset_size_'\
                                       + args.dset_size + '_loss_' + args.loss_fn
-   loss_dict['description'] = 'ADMM, muand tau,' +  args.n_iters + ' iterations, tau init 0.0002 ' + \
-                               args.num_epochs + ' epochs, ' + args.dataset_len + ' dataset ' + args.dset_size
+   loss_dict['description'] = 'ADMM, muand tau,' + args.n_iters + ' iterations, tau init 0.0002 ' + \
+                               str(args.num_epochs) + ' epochs, ' + args.dataset_len + ' dataset ' + args.dset_size
 
    save_filename = ('../saved_models/saved_stats/'+loss_dict['filename'])
 
