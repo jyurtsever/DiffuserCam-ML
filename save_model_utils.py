@@ -18,10 +18,10 @@ def save_model_summary(model, test_loader, args):
    model = model.to(device)
 
    loss_dict = test_training_images(model, test_loader, device)
-   time_gpu, time_cpu = run_timing_test(model, test_loader, device)
+   time_gpu = run_timing_test(model, test_loader, device)
 
    loss_dict['time_gpu'] = time_gpu
-   loss_dict['time_cpu'] = time_cpu
+   #loss_dict['time_cpu'] = time_cpu
 
    loss_dict['filename'] = 'net_' + args.net + '_ADMM_' + args.n_iters + '_dset_size_'\
                                       + args.dset_size + '_loss_' + args.loss_fn
@@ -80,7 +80,7 @@ def test_training_images(model, test_loader, device):
 def run_timing_test(model, test_loader, device, num_trials = 100):
    print('\r', 'running timing test', end = '')
    t_avg_gpu = 0
-   t_avg_cpu = 0
+   #t_avg_cpu = 0
 
    with torch.no_grad():
        for i_batch, sample_batched in enumerate(test_loader):
@@ -96,21 +96,21 @@ def run_timing_test(model, test_loader, device, num_trials = 100):
        elapsed = time.time() - t
        t_avg_gpu = t_avg_gpu + elapsed
        print(i)
-   model_cpu = model.to('cpu')
-   inputs_cpu = inputs.to('cpu')
-   if model.__class__.__name__ == 'MyEnsemble':
-      model_cpu.admm_model.to('cpu')
-      model_cpu.denoise_model.to('cpu')
-
-   print('\r', 'running CPU timing test', end = '')
-   for i in range(0,num_trials):
-      t = time.time()
-      output_cpu = model_cpu(inputs_cpu)
-      elapsed = time.time() - t
-      t_avg_cpu = t_avg_cpu + elapsed
+   # model_cpu = model.to('cpu')
+   # inputs_cpu = inputs.to('cpu')
+   # if model.__class__.__name__ == 'MyEnsemble':
+   #    model_cpu.admm_model.to('cpu')
+   #    model_cpu.denoise_model.to('cpu')
+   #
+   # print('\r', 'running CPU timing test', end = '')
+   # for i in range(0,num_trials):
+   #    t = time.time()
+   #    output_cpu = model_cpu(inputs_cpu)
+   #    elapsed = time.time() - t
+   #    t_avg_cpu = t_avg_cpu + elapsed
 
 
    t_avg_gpu = t_avg_gpu/num_trials
-   t_avg_cpu = t_avg_cpu/num_trials
+   #t_avg_cpu = t_avg_cpu/num_trials
 
-   return t_avg_gpu, t_avg_cpu
+   return t_avg_gpu #, t_avg_cpu
