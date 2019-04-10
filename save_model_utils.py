@@ -95,7 +95,7 @@ def run_timing_test(model, test_loader, device, num_trials = 100):
        output = model(inputs)
        elapsed = time.time() - t
        t_avg_gpu = t_avg_gpu + elapsed
-
+       print(i)
    model_cpu = model.to('cpu')
    inputs_cpu = inputs.to('cpu')
    if model.__class__.__name__ == 'MyEnsemble':
