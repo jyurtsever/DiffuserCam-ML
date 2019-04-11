@@ -117,6 +117,9 @@ def unet_optimize(args):
     elif args.net == 'UNet256':
         model = UNet256256((3, 128, 128))
         print('Using unet256')
+    elif args.net == 'UNet128':
+        model = UNet128128((3, 128, 128))
+        print('Using UNet128')
     else:
         raise IOError('ERROR: Unrecognized net')
     if use_gpu:
