@@ -109,7 +109,7 @@ def unet_optimize(args):
     train_set = DiffuserDataset(csv_path_train, rec_dir, gt_dir, transform=transformations, use_gpu=use_gpu)
     test_set = DiffuserDataset(csv_path_test, rec_dir, gt_dir, transform=transformations, use_gpu=use_gpu)
     # train_set = datasets.ImageFolder(csv_path_train, transform = transformations)
-    # test_set = datasets.ImageFolder(csv_path_test, transform=transformations)
+    ## test_set = datasets.ImageFolder(csv_path_test, transform=transformations)
     train_loader = torchdata.DataLoader(train_set, batch_size = BATCH_SIZE, shuffle = False)
     test_loader = torchdata.DataLoader(test_set, batch_size = BATCH_SIZE, shuffle = False)
     if args.net == 'UNet512':
