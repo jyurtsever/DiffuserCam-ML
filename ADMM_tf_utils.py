@@ -95,7 +95,7 @@ def _read_py_function(filename, filename_gt, ds):
     name = filename.decode()
     path_diffuser = os.path.join(path, 'diffuser_images_4_4/', name)
     path_gt = os.path.join(path, 'gt_images_4_4/', name)
-    
+    print(path_gt)
     image_diffuser = cv.imread(path_diffuser, -1).astype(np.float32)/2048. - 0.008273973
     image_gt = cv.imread(path_gt, -1).astype(np.float32)/256. 
     image_diffuser_out = downsample_ax(image_diffuser, ds)
