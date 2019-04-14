@@ -200,16 +200,18 @@ if __name__ == '__main__':
     # if use_gpu:
     #     print("CURRENT DEVICE: ", torch.cuda.current_device(), "num_devices: ", torch.cuda.device_count())
     # data_dir = args.data_dir
-    if args.dset_size == 'big':
-        csv_path_test = '../saved_models_4_4/dataset_12_12_test.csv'
-        test_filenames = pd.read_csv(csv_path_test)
-        csv_path_train = '../saved_models_4_4/dataset_12_12.csv'
-    elif args.dset_size == 'short':
-        csv_path_test = '../saved_models_4_4/dataset_12_12_test_short.csv'
-        test_filenames = pd.read_csv(csv_path_test)
-        csv_path_train = '../saved_models_4_$/dataset_12_12_short.csv'
-    else:
-        raise IOError("Dataset size not recognized")
+    # if args.dset_size == 'big':
+    #     csv_path_test = '../saved_models_4_4/dataset_12_12_test.csv'
+    #     test_filenames = pd.read_csv(csv_path_test)
+    #     csv_path_train = '../saved_models_4_4/dataset_12_12.csv'
+    # elif args.dset_size == 'short':
+    #     csv_path_test = '../saved_models_4_4/dataset_12_12_test_short.csv'
+    #     test_filenames = pd.read_csv(csv_path_test)
+    #     csv_path_train = '../saved_models_4_$/dataset_12_12_short.csv'
+    # else:
+    #     raise IOError("Dataset size not recognized")
+    csv_path_train = '../saved_models_4_4/train_names.csv'
+    csv_path_test = '../saved_models_4_4/test_names.csv'
     gt_dir = args.gt_dir
     rec_dir = args.recon_dir
     BATCH_SIZE = int(args.batch_size)
