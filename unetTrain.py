@@ -212,6 +212,8 @@ if __name__ == '__main__':
     #     raise IOError("Dataset size not recognized")
     csv_path_train = '../saved_models_4_4/train_names.csv'
     csv_path_test = '../saved_models_4_4/test_names.csv'
+    test_filenames = pd.read_csv(csv_path_test)
+
     gt_dir = args.gt_dir
     rec_dir = args.recon_dir
     BATCH_SIZE = int(args.batch_size)
