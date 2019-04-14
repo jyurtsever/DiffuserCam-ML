@@ -90,11 +90,11 @@ def gkern(DIMS0, DIMS1, nsig=3):
 
 
 def _read_py_function(filename, filename_gt, ds):
-    path = '/home/jyurtsever/research/mirflickr25k/'
+    path = '/home/jyurtsever/research/4_4_dataset/'
     
     name = filename.decode()
-    path_diffuser = os.path.join(path, 'diffuser_images_2_14_auto/', name)
-    path_gt = os.path.join(path, 'gt_images_2_14_auto/', name)
+    path_diffuser = os.path.join(path, 'diffuser_images_4_4/', name)
+    path_gt = os.path.join(path, 'gt_images_4_4/', name)
     
     image_diffuser = cv.imread(path_diffuser, -1).astype(np.float32)/2048. - 0.008273973
     image_gt = cv.imread(path_gt, -1).astype(np.float32)/256. 

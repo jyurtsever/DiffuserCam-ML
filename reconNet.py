@@ -311,7 +311,7 @@ class UNet128128(nn.Module):
         self.up3 = StackDecoder(128, 128, 64, kernel_size=3)  # 128
         self.up2 = StackDecoder(64, 64, 24, kernel_size=3)  # 256
         self.up1 = StackDecoder(24, 24, 24, kernel_size=3)  # 512
-        self.classify = nn.Conv2d(24, 3, kernel_size=1, bias=True)
+        self.classify = nn.conv2d(24, 3, kernel_size=1, bias=True)
 
         self.center = nn.Sequential(ConvBnRelu2d(128, 128, kernel_size=3, padding=1))
 
