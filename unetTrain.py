@@ -194,7 +194,7 @@ if __name__ == '__main__':
     args = CLI.parse_args()
 
     dir_name = 'net_' + args.net + '_ADMM_' + args.n_iters + '_dset_size_' + args.dset_size + '_loss_' + args.loss_fn
-    save_path = '../saved_models/' + dir_name + '/'
+    save_path = '../saved_models_4_4/' + dir_name + '/'
     os.mkdir(save_path); os.mkdir(save_path + 'gt/'); os.mkdir(save_path + 'out/'); os.mkdir(save_path + 'recon/')
     # use_gpu = args.gpu != -1
     # if use_gpu:
