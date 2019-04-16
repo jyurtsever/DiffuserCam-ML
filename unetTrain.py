@@ -190,6 +190,11 @@ if __name__ == '__main__':
         type=str,
         default='UNet512'
     )
+    CLI.add_argument(
+        "--save_path",
+        type=str,
+        default='../saved_models_4_4/''
+    )
 
     args = CLI.parse_args()
 

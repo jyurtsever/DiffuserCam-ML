@@ -29,7 +29,7 @@ def save_model_summary(model, test_loader, args):
                                str(args.num_epochs) + ' epochs, ' + ' dataset ' + args.dset_size + \
                               ' loss ' + args.loss_fn
 
-   save_filename = ('../saved_models/saved_stats/'+loss_dict['filename'])
+   save_filename = (args.save_path + '/saved_stats/'+loss_dict['filename'])
 
    print('\r', 'Saving as:', save_filename, end = '')
    scipy.io.savemat(save_filename, loss_dict)
