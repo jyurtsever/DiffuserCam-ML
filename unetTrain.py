@@ -130,7 +130,7 @@ def unet_optimize(args):
     evaluate(model, loss_fn, test_loader)
 
 if __name__ == '__main__':
-    use_gpu = torch.cuda.is_available()
+    use_gpu = False# torch.cuda.is_available()
     CLI = argparse.ArgumentParser()
     CLI.add_argument(
         "--recon_dir",  # name on the CLI - drop the `--` for positional/required parameters
