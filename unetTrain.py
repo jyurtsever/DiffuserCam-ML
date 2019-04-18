@@ -37,23 +37,22 @@ def torch_to_im(i, torch_mat):
 
 
 def train(model, optimizer, loss_fn, train_loader, epoch):
-    pass
-    # for batch_idx, item in enumerate(train_loader):
-    #     X_batch, Y_batch = item['image'], item['label']
-    #     optimizer.zero_grad()
-    #     # print(X_batch.shape, "okkkkkk")
-    #     # plt.imshow(Y_batch[1, 1, :,:].numpy())
-    #     # plt.show()
-    #     # plt.imshow(X_batch[1, 1, :, :].numpy())
-    #     # plt.show()
-    #     output = model(X_batch)
-    #     loss = loss_fn(output, Y_batch)
-    #     loss.sum().backward()#loss.backward()
-    #     optimizer.step()
-    #     if batch_idx % 20 == 0:
-    #         print('Epoch : {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-    #             epoch, batch_idx*len(X_batch), len(train_loader.dataset), 100.*batch_idx / \
-    #             len(train_loader), loss.sum().item()))
+    for batch_idx, item in enumerate(train_loader):
+        X_batch, Y_batch = item['image'], item['label']
+        optimizer.zero_grad()
+        # print(X_batch.shape, "okkkkkk")
+        # plt.imshow(Y_batch[1, 1, :,:].numpy())
+        # plt.show()
+        # plt.imshow(X_batch[1, 1, :, :].numpy())
+        # plt.show()
+        output = model(X_batch)
+        loss = loss_fn(output, Y_batch)
+        loss.sum().backward()#loss.backward()
+        optimizer.step()
+        if batch_idx % 20 == 0:
+            print('Epoch : {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                epoch, batch_idx*len(X_batch), len(train_loader.dataset), 100.*batch_idx / \
+                len(train_loader), loss.sum().item()))
 
 def evaluate(model, loss_fn, test_loader):
     output = None
