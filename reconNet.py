@@ -472,6 +472,7 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
+        print(x.shape)
         x = self.conv1(x)
         print(x.shape)
         x = self.bn1(x)
