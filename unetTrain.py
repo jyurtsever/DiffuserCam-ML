@@ -204,9 +204,6 @@ if __name__ == '__main__':
     save_path = args.save_path + dir_name + '/'
     os.mkdir(save_path); os.mkdir(save_path + 'gt/'); os.mkdir(save_path + 'out/'); os.mkdir(save_path + 'recon/')
     if args.save_path == '../saved_models/':
-        if use_gpu:
-            print("CURRENT DEVICE: ", torch.cuda.current_device(), "num_devices: ", torch.cuda.device_count())
-        data_dir = args.data_dir
         if args.dset_size == 'big':
             csv_path_test = '../saved_models_4_4/dataset_12_12_test.csv'
             test_filenames = pd.read_csv(csv_path_test)
