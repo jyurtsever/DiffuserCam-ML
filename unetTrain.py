@@ -203,22 +203,28 @@ if __name__ == '__main__':
     dir_name = 'net_' + args.net + '_ADMM_' + args.n_iters + '_dset_size_' + args.dset_size + '_loss_' + args.loss_fn
     save_path = args.save_path + dir_name + '/'
     os.mkdir(save_path); os.mkdir(save_path + 'gt/'); os.mkdir(save_path + 'out/'); os.mkdir(save_path + 'recon/')
-    # use_gpu = args.gpu != -1
-    # if use_gpu:
-    #     print("CURRENT DEVICE: ", torch.cuda.current_device(), "num_devices: ", torch.cuda.device_count())
-    # data_dir = args.data_dir
-    # if args.dset_size == 'big':
-    #     csv_path_test = '../saved_models_4_4/dataset_12_12_test.csv'
-    #     test_filenames = pd.read_csv(csv_path_test)
-    #     csv_path_train = '../saved_models_4_4/dataset_12_12.csv'
-    # elif args.dset_size == 'short':
-    #     csv_path_test = '../saved_models_4_4/dataset_12_12_test_short.csv'
-    #     test_filenames = pd.read_csv(csv_path_test)
-    #     csv_path_train = '../saved_models_4_$/dataset_12_12_short.csv'
-    # else:
-    #     raise IOError("Dataset size not recognized")
-    csv_path_train = '../saved_models_4_4/train_names.csv'
-    csv_path_test = '../saved_models_4_4/test_names.csv'
+    if args.save_path == '../saved_models/':
+        if use_gpu:
+            print("CURRENT DEVICE: ", torch.cuda.current_device(), "num_devices: ", torch.cuda.device_count())
+        data_dir = args.data_dir
+        if args.dset_size == 'big':
+            csv_path_test = '../saved_models_4_4/dataset_12_12_test.csv'
+            test_filenames = pd.read_csv(csv_path_test)
+            csv_path_train = '../saved_models_4_4/dataset_12_12.csv'
+        elif args.dset_size == 'short':
+            csv_path_test = '../saved_models_4_4/dataset_12_12_test_short.csv'
+            test_filenames = pd.read_csv(csv_path_test)
+            csv_path_train = '../saved_models_4_$/dataset_12_12_short.csv'
+        else:
+            raise IOError("Dataset size not recognized")
+
+    elif args.save_path == '../saved_models_4_4/':
+        csv_path_train = '../saved_models_4_4/train_names.csv'
+        csv_path_test = '../saved_models_4_4/test_names.csv'
+
+    else:
+        raise IOError("save path does not exist")
+
     test_filenames = pd.read_csv(csv_path_test)
 
     gt_dir = args.gt_dir
