@@ -487,7 +487,7 @@ class ResNet(nn.Module):
         # if self.dropout is not None:
         #     x = self.dropout(x)
         # x = self.fc(x)
-        print(x.shape())
+        print(x.shape)
         return x
 
 def reconResNet():
