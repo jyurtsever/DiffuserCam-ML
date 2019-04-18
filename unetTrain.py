@@ -120,6 +120,9 @@ def unet_optimize(args):
     elif args.net == 'UNet128':
         model = UNet128128((3, 128, 128))
         print('Using UNet128')
+    elif args.net == 'ResNet':
+        model = reconResNet()
+        print('ResNet')
     else:
         raise IOError('ERROR: Unrecognized net')
     if use_gpu:
