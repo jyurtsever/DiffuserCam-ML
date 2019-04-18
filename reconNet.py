@@ -490,4 +490,4 @@ class ResNet(nn.Module):
         return x
 
 def reconResNet():
-    return ResNet(BasicBlock(), [2, 2, 2, 2])
+    return ResNet(BasicBlock, [2, 2, 2, 2])
