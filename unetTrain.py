@@ -205,13 +205,13 @@ if __name__ == '__main__':
     os.mkdir(save_path); os.mkdir(save_path + 'gt/'); os.mkdir(save_path + 'out/'); os.mkdir(save_path + 'recon/')
     if args.save_path == '../saved_models/':
         if args.dset_size == 'big':
-            csv_path_test = '../saved_models_4_4/dataset_12_12_test.csv'
+            csv_path_test = '../saved_models/dataset_12_12_test.csv'
             test_filenames = pd.read_csv(csv_path_test)
-            csv_path_train = '../saved_models_4_4/dataset_12_12.csv'
+            csv_path_train = '../saved_models/dataset_12_12.csv'
         elif args.dset_size == 'short':
-            csv_path_test = '../saved_models_4_4/dataset_12_12_test_short.csv'
+            csv_path_test = '../saved_models/dataset_12_12_test_short.csv'
             test_filenames = pd.read_csv(csv_path_test)
-            csv_path_train = '../saved_models_4_$/dataset_12_12_short.csv'
+            csv_path_train = '../saved_models/dataset_12_12_short.csv'
         else:
             raise IOError("Dataset size not recognized")
 
