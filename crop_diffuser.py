@@ -1,4 +1,4 @@
-from ADMM_tf_utils import *
+
 #from admm_rgb import *
 #from model_unrolled_layered import *
 
@@ -6,6 +6,7 @@ from ADMM_tf_utils import *
 import progressbar
 import scipy
 import sys
+from ADMM_tf_utils import *
 
 def main():
     bar = progressbar.ProgressBar(maxval=num_photos, widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
@@ -14,7 +15,7 @@ def main():
 
     for i in range(start, min(start + num_photos, len(csv_contents))):
         im_name = csv_contents.iloc[i,0]
-        im, gt_im = __read_py_function(im_name, im_name, down_sizing)
+        im, gt_im = read_and_downsample_im(im_name, im_name, down_sizing)
         scipy.misc.imsave(save_path + im_name, im)
         bar.update(i)
     bar.finish()

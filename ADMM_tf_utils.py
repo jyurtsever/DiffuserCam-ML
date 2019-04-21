@@ -108,6 +108,9 @@ def _read_py_function(filename, filename_gt, ds):
     return image_diffuser_out, image_gt_out
 
 
+def read_and_downsample_im(filename, filename_gt, ds):
+    return _read_py_function(filename, filename_gt, ds)
+
 def make_dataset(csv_file, ds, start=0):
     csv_contents = pd.read_csv(csv_file)
     
