@@ -90,7 +90,7 @@ def gkern(DIMS0, DIMS1, nsig=3):
 
 
 def _read_py_function(filename, filename_gt, ds):
-    path = '/home/jyurtsever/research/mirflickr/'
+    path = '/home/jyurtsever/research/mirflickr25k/'
     
     name = filename.decode()
     path_diffuser = os.path.join(path, 'diffuser_images_2_14_auto', name)
