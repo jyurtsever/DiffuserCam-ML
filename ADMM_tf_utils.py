@@ -109,7 +109,21 @@ def _read_py_function(filename, filename_gt, ds):
 
 
 def read_and_downsample_im(filename, filename_gt, ds):
-    return _read_py_function(filename, filename_gt, ds)
+    path = '/home/jyurtsever/research/mirflickr25k/'
+    name = filename
+    path_diffuser = os.path.join(path, 'diffuser_images_2_14_auto', name)
+    path_gt = os.path.join(path, 'gt_images_2_14_auto/', name)
+    image_diffuser = cv.imread(path_diffuser, -1).astype(np.float32) / 2048. - 0.008273973
+    image_gt = cv.imread(path_gt, -1).astype(np.float32) / 256.
+    image_diffuser_out = downsample_ax(image_diffuser, ds)
+    # Apply calibration
+    calib_data = scipy.io.loadmat('../recon_files/calibration_2_15_v2.mat')
+    #     image_gt_out = cv.undistort(image_gt, calib_data['mtx'], calib_data['dist'])  # Lens correction
+    #     image_gt_out = np.flipud(downsample_ax(image_gt_out, ds))                      # Downsample and flip
+    image_gt_out = np.flipud(image_gt)
+    #     #Warp image to align with Diffuser:
+    #     image_gt_out = cv.warpAffine(image_gt_out, calib_data['M'], (image_gt_out.shape[1], image_gt_out.shape[0]))
+    return image_diffuser_out, image_gt_out
 
 def make_dataset(csv_file, ds, start=0):
     csv_contents = pd.read_csv(csv_file)
