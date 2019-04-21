@@ -17,6 +17,7 @@ def main():
         im_name = csv_contents.iloc[i,0]
         im, gt_im = __read_py_function(im_name, im_name, down_sizing)
         scipy.misc.imsave(save_path + im_name, im)
+        print(i)
         bar.update(i)
     bar.finish()
 
