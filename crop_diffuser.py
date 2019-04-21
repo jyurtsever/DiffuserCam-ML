@@ -8,9 +8,9 @@ import scipy
 import sys
 
 def main():
-    bar = progressbar.ProgressBar(maxval=num_photos, \
-                                  widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+    bar = progressbar.ProgressBar(maxval=num_photos, widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
     bar.start()
+    print('yo')
     csv_contents = pd.read_csv(csv_file_path)
 
     for i in range(start, min(start + num_photos, len(csv_contents))):
