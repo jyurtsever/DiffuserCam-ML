@@ -10,14 +10,12 @@ import sys
 def main():
     bar = progressbar.ProgressBar(maxval=num_photos, widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
     bar.start()
-    print('yo')
     csv_contents = pd.read_csv(csv_file_path)
 
     for i in range(start, min(start + num_photos, len(csv_contents))):
         im_name = csv_contents.iloc[i,0]
         im, gt_im = __read_py_function(im_name, im_name, down_sizing)
         scipy.misc.imsave(save_path + im_name, im)
-        print(i)
         bar.update(i)
     bar.finish()
 
@@ -33,3 +31,4 @@ if __name__ == '__main__':
     #####   SAVE FILE    #####
     save_path = sys.argv[5]
     down_sizing = 4
+    main()
