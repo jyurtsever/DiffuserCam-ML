@@ -23,7 +23,7 @@ def main():
 
 
 if __name__ == '__main__':
-    csv_file_path = '../mirflickr25k/filenames.csv/'
+    csv_file_path = '../mirflickr25k/filenames.csv'
     num_photos = int(sys.argv[1])
     num_iters = int(sys.argv[2])
     start = int(sys.argv[3])
