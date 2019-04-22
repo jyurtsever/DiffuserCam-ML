@@ -46,8 +46,13 @@ def train(model, optimizer, loss_fn, train_loader, epoch):
         # plt.imshow(X_batch[1, 1, :, :].numpy())
         # plt.show()
         output = model(X_batch)
+
         loss = loss_fn(output, Y_batch)
-        loss.sum().backward()#loss.backward()
+        if args.loss_fn == 'lpips':
+            loss.sum().backward()  # loss.backward()
+        elif args.loss_fn == 'mse':
+            loss.backward()
+
         optimizer.step()
         if batch_idx % 20 == 0:
             print('Epoch : {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
@@ -65,10 +70,13 @@ def evaluate(model, loss_fn, test_loader):
                     output = model(X_batch)
                     loss = loss_fn(output, Y_batch)
                     # loss.backward()
-
+                    if args.loss_fn == 'lpips':
+                        l = loss.sum()  # loss.backward()
+                    elif args.loss_fn == 'mse':
+                        l = loss
                     print('[{}/{} ({:.0f}%)] \t Test Loss: {:.6f}'.format(
                         batch_idx*len(X_batch), len(test_loader.dataset), 100.*batch_idx / \
-                            len(test_loader), loss.sum().item()))
+                            len(test_loader), l))
                     if batch_idx < 7:
                         out = output.cpu().detach().numpy()
                         # gt = Y_batch.cpu().numpy()
@@ -135,7 +143,13 @@ def unet_optimize(args):
         raise IOError('ERROR: Unrecognized net')
     if use_gpu:
         model = model.cuda()
-    loss_fn = ps.PerceptualLoss().forward #nn.MSELoss()
+
+    if args.loss_fn == 'lpips':
+        loss_fn = ps.PerceptualLoss().forward #nn.MSELoss()
+    elif args.loss_fn == 'mse':
+        loss_fn = nn.MSELoss()
+    else:
+        raise IOError('ERROR: Unrecognized loss')
     optimizer = torch.optim.Adam(model.parameters())
     run_train(model, optimizer, loss_fn, train_loader, int(args.num_epochs))
     evaluate(model, loss_fn, test_loader)
