@@ -422,7 +422,7 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block, layers, zero_init_residual=False, dropout=0):
+    def __init__(self, block, layers, widths=[64, 128, 128, 64], zero_init_residual=False, dropout=0):
         super(ResNet, self).__init__()
         self.inplanes = 64
         self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=1, padding=3,
@@ -430,11 +430,11 @@ class ResNet(nn.Module):
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=1, padding=1)
-        self.layer1 = self._make_layer(block, 64, layers[0])
-        self.layer2 = self._make_layer(block, 128, layers[1], stride=1)
-        self.layer3 = self._make_layer(block, 128, layers[2], stride=1)
-        self.layer4 = self._make_layer(block, 64, layers[3], stride=1)
-        self.classify = nn.Conv2d(64, 3, kernel_size=1, bias=True)
+        self.layer1 = self._make_layer(block, widths[0], layers[0])
+        self.layer2 = self._make_layer(block, widths[1], layers[1], stride=1)
+        self.layer3 = self._make_layer(block, widths[2], layers[2], stride=1)
+        self.layer4 = self._make_layer(block, widths[3], layers[3], stride=1)
+        self.classify = nn.Conv2d(widths[3], 3, kernel_size=1, bias=True)
         #self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
        # self.fc = nn.Linear(widths[-1] * block.expansion, num_classes)
 
@@ -490,3 +490,12 @@ class ResNet(nn.Module):
 
 def reconResNet():
     return ResNet(BasicBlock, [2, 2, 2, 2])
+
+def reconResNet2():
+    return ResNet(BasicBlock, [1, 1, 1, 1])
+
+def reconResNet3():
+    return ResNet(BasicBlock, [2, 2, 2, 2], widths=[32, 64, 64, 32])
+
+def reconResNet4():
+    return ResNet(BasicBlock, [1, 1, 1, 1], widths=[32, 64, 64, 32])
