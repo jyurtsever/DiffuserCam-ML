@@ -151,7 +151,7 @@ def unet_optimize(args):
     elif args.loss_fn == 'both':
         loss_lpips = ps.PerceptualLoss().forward
         loss_mse = nn.MSELoss()
-        loss_fn = lambda output, Y_batch: loss_mse(output, Y_batch) + loss_lpips(output, Y_batch).sum()
+        loss_fn = lambda output, Y_batch: 100*loss_mse(output, Y_batch) + loss_lpips(output, Y_batch).sum()
     else:
         raise IOError('ERROR: Unrecognized loss')
     optimizer = torch.optim.Adam(model.parameters())
