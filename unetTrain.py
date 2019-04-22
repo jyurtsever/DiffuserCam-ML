@@ -50,7 +50,7 @@ def train(model, optimizer, loss_fn, train_loader, epoch):
         loss = loss_fn(output, Y_batch)
         if args.loss_fn == 'lpips':
             loss.sum().backward()  # loss.backward()
-        elif args.loss_fn == 'mse':
+        elif args.loss_fn == 'mse' or args.loss_fn == 'both':
             loss.backward()
 
         optimizer.step()
@@ -72,7 +72,7 @@ def evaluate(model, loss_fn, test_loader):
                     # loss.backward()
                     if args.loss_fn == 'lpips':
                         l = loss.sum()  # loss.backward()
-                    elif args.loss_fn == 'mse':
+                    elif args.loss_fn == 'mse' or args.loss_fn == 'both':
                         l = loss
                     print('[{}/{} ({:.0f}%)] \t Test Loss: {:.6f}'.format(
                         batch_idx*len(X_batch), len(test_loader.dataset), 100.*batch_idx / \
@@ -148,6 +148,10 @@ def unet_optimize(args):
         loss_fn = ps.PerceptualLoss().forward #nn.MSELoss()
     elif args.loss_fn == 'mse':
         loss_fn = nn.MSELoss()
+    elif args.loss_fn == 'both':
+        loss_lpips = ps.PerceptualLoss().forward
+        loss_mse = nn.MSELoss()
+        loss_fn = lambda output, Y_batch: loss_mse(output, Y_batch) + loss_lpips(output, Y_batch).sum()
     else:
         raise IOError('ERROR: Unrecognized loss')
     optimizer = torch.optim.Adam(model.parameters())
