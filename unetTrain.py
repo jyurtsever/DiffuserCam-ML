@@ -113,7 +113,7 @@ def unet_optimize(args):
     transformations = transforms.Compose([transforms.ToTensor()])
                                                                     #transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                                                     #std=[0.229, 0.224, 0.225])])
-    train_set = DiffuserDataset(csv_path_train, rec_dir, gt_dir, num_data=args.dset_size, transform=transformations, use_gpu=use_gpu)
+    train_set = DiffuserDataset(csv_path_train, rec_dir, gt_dir, num_data=int(args.dset_size), transform=transformations, use_gpu=use_gpu)
     test_set = DiffuserDataset(csv_path_test, rec_dir, gt_dir, transform=transformations, use_gpu=use_gpu)
     # train_set = datasets.ImageFolder(csv_path_train, transform = transformations)
     ## test_set = datasets.ImageFolder(csv_path_test, transform=transformations)
