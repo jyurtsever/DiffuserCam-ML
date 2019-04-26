@@ -233,7 +233,7 @@ if __name__ == '__main__':
     save_path = args.save_path + dir_name + '/'
     os.mkdir(save_path); os.mkdir(save_path + 'gt/'); os.mkdir(save_path + 'out/'); os.mkdir(save_path + 'recon/')
     if args.save_path == '../saved_models/':
-        if args.dset_size == 'big':
+        if args.dset_size != 'short':
             csv_path_test = '../saved_models/dataset_12_12_test.csv'
             test_filenames = pd.read_csv(csv_path_test)
             csv_path_train = '../saved_models/dataset_12_12.csv'
