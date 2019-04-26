@@ -22,7 +22,7 @@ from torch.utils.data import Dataset
 class DiffuserDataset(Dataset):
    """Diffuser dataset."""
 
-   def __init__(self, csv_file, data_dir, label_dir, transform=None, use_gpu = False):
+   def __init__(self, csv_file, data_dir, label_dir, num_data=None, transform=None, use_gpu = False):
        """
        Args:
            csv_file (string): Path to the csv file with annotations.
@@ -31,7 +31,10 @@ class DiffuserDataset(Dataset):
            transform (callable, optional): Optional transform to be applied
                on a sample.
        """
-       self.csv_contents = pd.read_csv(csv_file)
+       if num_data:
+           self.csv_contents = pd.read_csv(csv_file, nrows=num_data)
+       else:
+           self.csv_contents = pd.read_csv(csv_file)
        self.data_dir = data_dir
        self.label_dir = label_dir
        self.transform = transform
