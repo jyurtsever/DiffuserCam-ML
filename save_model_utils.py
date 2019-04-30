@@ -58,7 +58,7 @@ def test_training_images(model, test_loader, device):
            output = model(inputs)
 
            mse_batch = mse_loss(output, labels)
-           lpips_batch = lpipsloss.forward_pair(output, inputs)
+           lpips_batch = lpipsloss.forward_pair(output, labels)
            psnr_batch = 20 * torch.log10(1 / torch.sqrt(mse_batch))
 
            loss_dict['mse'].append(mse_batch.cpu().detach().numpy().squeeze())
