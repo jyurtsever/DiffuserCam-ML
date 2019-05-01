@@ -37,7 +37,7 @@ def torch_to_im(i, torch_mat):
 
 def evaluate(model, test_loader):
     print("Running Kristinas's code")
-    model.load_state_dict(torch.load(save_path + 'saved_network.pt'))
+    model.load_state_dict(torch.load(save_path + 'saved_network.pt')['model_state_dict'])
     save_model_summary(model, test_loader, args)
 
 def unet_optimize(args):
