@@ -134,7 +134,7 @@ if __name__ == '__main__':
     CLI.add_argument(
         "--dset_size",
         type=str,
-        default=None,
+        default="big",
     )
 
     CLI.add_argument(
