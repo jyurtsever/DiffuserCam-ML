@@ -158,7 +158,7 @@ def unet_optimize(args):
         loss_fn = lambda output, Y_batch: 10*loss_mse(output, Y_batch) + loss_lpips(output, Y_batch).sum()
     else:
         raise IOError('ERROR: Unrecognized loss')
-    optimizer = torch.optim.Adam(model.parameters())
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     run_train(model, optimizer, loss_fn, train_loader, int(args.num_epochs))
     evaluate(model, loss_fn, test_loader)
 
@@ -228,6 +228,19 @@ if __name__ == '__main__':
         type=str,
         default='../saved_models_4_4/'
     )
+
+    CLI.add_argument(
+        "--lr",
+        type=float,
+        default= 0.001
+    )
+
+    CLI.add_argument(
+        "--weight_decay",
+        type=float,
+        default=0.0
+    )
+
 
     args = CLI.parse_args()
     if args.dset_size:
