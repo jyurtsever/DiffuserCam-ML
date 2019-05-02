@@ -45,9 +45,12 @@ class DiffuserDataset(Dataset):
        return len(self.csv_contents)
 
    def __getitem__(self, idx):
-       def initialize_img(path):
+       def initialize_img(path, flip=False):
            #print(path)
-           img = cv2.imread(path, -1).astype(np.float32)/512
+           if flip:
+               img = np.flipud(cv2.imread(path, -1)).astype(np.float32) / 512
+           else:
+               img = cv2.imread(path, -1).astype(np.float32)/512
            if len(img.shape) > 2 and img.shape[2] == 4:
                img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
            return img
@@ -55,9 +58,10 @@ class DiffuserDataset(Dataset):
        img_name = self.csv_contents.iloc[idx,0]
 
        image = initialize_img(os.path.join(self.data_dir, img_name))
-       label = initialize_img(os.path.join(self.label_dir, img_name))
        if self.flipud_gt:
-           label = np.flipud(label)
+           label = initialize_img(os.path.join(self.label_dir, img_name), flip=True)
+       else:
+           label = initialize_img(os.path.join(self.label_dir, img_name))
        if self.transform:
            image = self.transform(image)
            label = self.transform(label)
