@@ -22,7 +22,7 @@ from torch.utils.data import Dataset
 class DiffuserDataset(Dataset):
    """Diffuser dataset."""
 
-   def __init__(self, csv_file, data_dir, label_dir, num_data=None, transform=None, use_gpu = False, flipud=False):
+   def __init__(self, csv_file, data_dir, label_dir, num_data=None, transform=None, use_gpu = False, flipud_gt=False):
        """
        Args:
            csv_file (string): Path to the csv file with annotations.
@@ -39,7 +39,7 @@ class DiffuserDataset(Dataset):
        self.label_dir = label_dir
        self.transform = transform
        self.use_gpu = use_gpu
-       self.flipud = flipud
+       self.flipud_gt = flipud_gt
 
    def __len__(self):
        return len(self.csv_contents)
@@ -50,15 +50,14 @@ class DiffuserDataset(Dataset):
            img = cv2.imread(path, -1).astype(np.float32)/512
            if len(img.shape) > 2 and img.shape[2] == 4:
                img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
-           if self.flipud:
-               img = np.flipud(img)
            return img
 
        img_name = self.csv_contents.iloc[idx,0]
 
        image = initialize_img(os.path.join(self.data_dir, img_name))
        label = initialize_img(os.path.join(self.label_dir, img_name))
-
+       if self.flipud_gt:
+           label = np.flipud(label)
        if self.transform:
            image = self.transform(image)
            label = self.transform(label)
