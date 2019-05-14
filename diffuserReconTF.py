@@ -26,8 +26,8 @@ import cv2 as cv
 
 
 def main():
-    csv_file_path = '../mirflickr/test_names.csv';
-    csv_file_path_test = '../mirflickr/train_names.csv';
+    csv_file_path = '../4_23_noscreen/filenames.csv';
+    csv_file_path_test = '../4_23_noscreen/filenames.csv';
 
     train_batch_size = batch_size
     test_batch_size = batch_size
