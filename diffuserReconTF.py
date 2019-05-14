@@ -47,7 +47,7 @@ def main():
     model.autotune = True
     model.realdata = True
     model.noise_std = 0.0
-    model.tau = model.tau * 1  # Regularization parameter
+    model.tau = model.tau * 1  # Regularization parameterls
 
 
 
