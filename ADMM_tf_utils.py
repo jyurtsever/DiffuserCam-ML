@@ -113,7 +113,7 @@ def read_and_downsample_im(filename, filename_gt, ds):
     name = filename
     path_diffuser = path + name #os.path.join(path, 'diffuser_images_2_14_auto', name)
     path_gt = path + name #os.path.join(path, 'gt_images_2_14_auto/', name)
-    image_diffuser = cv.imread(path_diffuser, -1).astype(np.float32) / 2048. - 0.008273973
+        image_diffuser = cv.imread(path_diffuser, -1).astype(np.float32) / 2048. - 0.008273973
     image_gt = cv.imread(path_gt, -1).astype(np.float32) / 256.
     image_diffuser_out = downsample_ax(image_diffuser, ds)
     # Apply calibration
