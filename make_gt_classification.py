@@ -8,8 +8,8 @@ num_images = 25000
 
 def main(args):
     num_class = len(filenames)
-    gt = [[0 for _ in range(num_class)] for _ in range(1, num_images + 1)]
-    for name, i in enumerate(filenames):
+    gt = [[0 for _ in range(num_class)] for _ in range(0, num_images + 1)]
+    for i, name in enumerate(filenames):
         f = open(args.ann_dir + name, 'r')
         for line in f:
             gt[int(line.strip())][i] = 1
@@ -17,10 +17,10 @@ def main(args):
 
     data = {}
     data['gt'] = []
-    for class_lst, im_num in enumerate(gt):
+    for im_num, class_lst in enumerate(gt):
         im_filename = "im{:05}.tiff".format(im_num)
         data['gt'].append({im_filename : class_lst})
-    with open('data.txt', 'w') as outfile:
+    with open(args.save_dir + 'gt_classif.txt', 'w') as outfile:
         json.dump(data, outfile)
 
 
