@@ -36,7 +36,7 @@ def train(model, optimizer, lossfn, num_epochs):
         running_loss = 0.0
         for i, data in enumerate(trainloader, 0):
             # get the inputs
-            inputs, labels = data
+            inputs, labels = data['image'], data['label']
             if use_gpu:
                 inputs, labels = inputs.cuda(), labels
             # print(inputs.shape, labels.shape)
