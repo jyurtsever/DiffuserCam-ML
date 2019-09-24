@@ -49,7 +49,7 @@ class DiffuserDatasetClassif(Dataset):
 
    def __getitem__(self, idx):
        def initialize_img(path, flip=False):
-           #print(path)
+           print(path)
            if flip:
                img = np.flipud(cv2.imread(path, -1)).astype(np.float32) / 512
            else:
