@@ -328,4 +328,4 @@ def Resnet152Templet(input_channel, pretrained=False, **kwargs):
         model_dict = LoadPretrainedModel(model, model_zoo.load_url(model_urls['resnet152']))
         model.load_state_dict(model_dict)
     return model
-
+#
