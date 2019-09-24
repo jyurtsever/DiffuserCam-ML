@@ -61,13 +61,13 @@ def train(model, optimizer, lossfn, num_epochs):
                 running_loss = 0.0
 
     print('Finished Training')
-    torch.save({
-        'epoch': epoch,
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-    }, "saved_network.pt")
-    np.save("losses.npy", np.array(losses))
-    np.save("iterations.npy", iterations)
+    # torch.save({
+    #     'epoch': epoch,
+    #     'model_state_dict': model.state_dict(),
+    #     'optimizer_state_dict': optimizer.state_dict(),
+    # }, "saved_network.pt")
+    # np.save("losses.npy", np.array(losses))
+    # np.save("iterations.npy", iterations)
     return model, losses, iterations
 
 def test(model):
