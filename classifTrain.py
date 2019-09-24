@@ -107,8 +107,8 @@ if __name__ == '__main__':
     parser.add_argument("--image_dir", type=str)
     parser.add_argument("--train_names", type=str)
     parser.add_argument("--test_names", type=str)
-    parser.add_argument("--num_epochs", type=str)
-    parser.add_argument("--batch_size", type=str)
+    parser.add_argument("--num_epochs", type=int)
+    parser.add_argument("--batch_size", type=int)
     args = parser.parse_args()
     use_gpu = torch.cuda.is_available()
 
