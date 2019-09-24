@@ -68,7 +68,7 @@ class DiffuserDatasetClassif(Dataset):
 
        if self.use_gpu:
            image = image.cuda()
-           label = label.cuda()
+           label = label
 
        sample = {'image': image, 'label': label}
 

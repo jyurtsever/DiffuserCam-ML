@@ -38,7 +38,7 @@ def train(model, optimizer, lossfn, num_epochs):
             # get the inputs
             inputs, labels = data
             if use_gpu:
-                inputs, labels = inputs.cuda(), labels.cuda()
+                inputs, labels = inputs.cuda(), labels
             # print(inputs.shape, labels.shape)
             # zero the parameter gradients
             optimizer.zero_grad()
