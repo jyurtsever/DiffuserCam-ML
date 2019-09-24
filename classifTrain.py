@@ -5,7 +5,7 @@ import torch
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
-
+import torchvision.transforms as transforms
 
 
 
@@ -112,8 +112,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     use_gpu = torch.cuda.is_available()
 
-
-    train_set = DiffuserDatasetClassif(args.train_names, args.image_dir, args.gt_file)
-    test_set = DiffuserDatasetClassif(args.test_names, args.image_dir, args.gt_file)
+    trans = transforms.Compose([transforms.ToTensor()])
+    train_set = DiffuserDatasetClassif(args.train_names, args.image_dir, args.gt_file, transforms=trans)
+    test_set = DiffuserDatasetClassif(args.test_names, args.image_dir, args.gt_file, transforms=trans)
 
     main(args)
