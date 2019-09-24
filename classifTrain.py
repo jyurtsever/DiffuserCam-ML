@@ -113,7 +113,7 @@ if __name__ == '__main__':
     use_gpu = torch.cuda.is_available()
 
     trans = transforms.Compose([transforms.ToTensor()])
-    train_set = DiffuserDatasetClassif(args.train_names, args.image_dir, args.gt_file, transforms=trans)
-    test_set = DiffuserDatasetClassif(args.test_names, args.image_dir, args.gt_file, transforms=trans)
+    train_set = DiffuserDatasetClassif(args.train_names, args.image_dir, args.gt_file, transform=trans)
+    test_set = DiffuserDatasetClassif(args.test_names, args.image_dir, args.gt_file, transform=trans)
 
     main(args)
