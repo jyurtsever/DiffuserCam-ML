@@ -76,7 +76,7 @@ def test(model):
     testloader = torchdata.DataLoader(test_set, batch_size=args.batch_size, shuffle=False)
     with torch.no_grad():
         for data in testloader:
-            images, labels = data
+            images, labels = data['image'], data['label']
             if use_gpu:
                 images, labels = images.cuda(), labels.cuda()
             outputs = model(images)
