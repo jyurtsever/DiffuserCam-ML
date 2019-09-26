@@ -49,7 +49,6 @@ class DiffuserDatasetClassif(Dataset):
 
    def __getitem__(self, idx):
        def initialize_img(path, flip=False):
-           print(path)
            if flip:
                img = np.flipud(cv2.imread(path, -1)).astype(np.float32) / 512
            else:
@@ -62,13 +61,13 @@ class DiffuserDatasetClassif(Dataset):
 
        image = initialize_img(os.path.join(self.data_dir, img_name))
        label = self.labels[int(img_name[2:7])][img_name]
-       label = torch.Tensor(label)
+       label = torch.FloatTensor(label)
        if self.transform:
            image = self.transform(image)
 
        if self.use_gpu:
            image = image.cuda()
-           label = label
+           label = label.cuda()
 
        sample = {'image': image, 'label': label}
 

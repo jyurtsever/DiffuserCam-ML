@@ -20,7 +20,7 @@ def main(args):
     model = resnet18(num_classes=14)
     if use_gpu:
         model = model.cuda()
-    lossfn = nn.CrossEntropyLoss()
+    lossfn = nn.MultiLabelSoftMarginLoss()
     optimizer = optim.Adam(model.parameters())
     train(model, optimizer, lossfn, args.num_epochs)
     test(model)
@@ -38,11 +38,10 @@ def train(model, optimizer, lossfn, num_epochs):
             # get the inputs
             inputs, labels = data['image'], data['label']
             if use_gpu:
-                inputs, labels = inputs.cuda(), labels
+                inputs, labels = inputs.cuda(), labels.cuda()
             # print(inputs.shape, labels.shape)
             # zero the parameter gradients
             optimizer.zero_grad()
-
             # forward + backward + optimize
             outputs = model(inputs)
             # print(outputs)
@@ -111,6 +110,7 @@ if __name__ == '__main__':
     parser.add_argument("--batch_size", type=int)
     args = parser.parse_args()
     use_gpu = torch.cuda.is_available()
+    print(use_gpu)
 
     trans = transforms.Compose([transforms.ToTensor()])
     train_set = DiffuserDatasetClassif(args.train_names, args.image_dir, args.gt_file, transform=trans)
