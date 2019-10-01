@@ -81,6 +81,8 @@ def test(model, loss_fn):
                 images, labels = images.cuda(), labels.cuda()
             outputs = model(images)
             losses.append(loss_fn(outputs, labels).item())
+    np.save("labels.npy", labels.cpu().numpy())
+    np.save("outputs.npy", outputs.cpu().numpy())
     print("Avg loss: {}".format(sum(losses)/len(losses)))
 
 if __name__ == '__main__':
