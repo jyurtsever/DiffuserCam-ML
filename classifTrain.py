@@ -23,7 +23,7 @@ def main(args):
     lossfn = nn.MultiLabelSoftMarginLoss()
     optimizer = optim.Adam(model.parameters())
     train(model, optimizer, lossfn, args.num_epochs)
-    test(model)
+    test(model, lossfn)
 
 def train(model, optimizer, lossfn, num_epochs):
     losses = []
@@ -69,36 +69,19 @@ def train(model, optimizer, lossfn, num_epochs):
     # np.save("iterations.npy", iterations)
     return model, losses, iterations
 
-def test(model):
+def test(model, loss_fn):
     correct_test = 0
     total = 0
     testloader = torchdata.DataLoader(test_set, batch_size=args.batch_size, shuffle=False)
+    losses = []
     with torch.no_grad():
         for data in testloader:
             images, labels = data['image'], data['label']
             if use_gpu:
                 images, labels = images.cuda(), labels.cuda()
             outputs = model(images)
-            _, predicted = torch.max(outputs.data, 1)
-            total += labels.size(0)
-            correct_test += (predicted == labels).sum().item()
-
-    print('Accuracy of the network on the 10000 test images: %d %%' % (
-            100 * correct_test / total))
-    correct_train = 0
-    total = 0
-    with torch.no_grad():
-        for data in testloader:
-            images, labels = data
-            if use_gpu:
-                images, labels = images.cuda(), labels.cuda()
-            outputs = model(images)
-            _, predicted = torch.max(outputs.data, 1)
-            total += labels.size(0)
-            correct_train += (predicted == labels).sum().item()
-
-    print('Accuracy of the network on the 50000 train images: %d %%' % (
-            100 * correct_train / total))
+            losses.append(loss_fn(outputs, labels).item())
+    print("Avg loss: {}".format(sum(losses)/len(losses)))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
