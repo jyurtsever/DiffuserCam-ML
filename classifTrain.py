@@ -126,6 +126,20 @@ def confusion_matrix(labels, outputs):
                                'fn': fn[i], 'accuracy' : accs[i]} for i in range(len(filenames))}
     return cm_dict, total_acc
 
+def get_labels(filenames):
+    num_class = len(filenames)
+    gt = [[0 for _ in range(num_class)] for _ in range(0, num_images + 1)]
+    for i, name in enumerate(filenames):
+        f = open(args.ann_dir + name, 'r')
+        for line in f:
+            gt[int(line.strip())][i] = 1
+        f.close()
+    data = []
+    for im_num, class_lst in enumerate(gt):
+        im_filename = "im{:05}.tiff".format(im_num)
+        data.append({im_filename : class_lst})
+    return data
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -136,12 +150,18 @@ if __name__ == '__main__':
     parser.add_argument("--num_epochs", type=int)
     parser.add_argument("--batch_size", type=int)
     parser.add_argument("--save_name", type=str)
+    parser.add_argument('cats', metavar='N', type=str, nargs='+',
+                        help='an integer for the accumulator')
+
     args = parser.parse_args()
     use_gpu = torch.cuda.is_available()
+
+    filenames = args.cats
+    labels = get_labels(filenames)
     print(use_gpu)
 
     trans = transforms.Compose([transforms.ToTensor()])
-    train_set = DiffuserDatasetClassif(args.train_names, args.image_dir, args.gt_file, transform=trans, use_gpu=use_gpu)
-    test_set = DiffuserDatasetClassif(args.test_names, args.image_dir, args.gt_file, transform=trans, use_gpu=use_gpu)
+    train_set = DiffuserDatasetClassif(args.train_names, args.image_dir, labels, transform=trans, use_gpu=use_gpu)
+    test_set = DiffuserDatasetClassif(args.test_names, args.image_dir, labels, transform=trans, use_gpu=use_gpu)
 
     main(args)

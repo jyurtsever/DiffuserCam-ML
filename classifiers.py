@@ -23,7 +23,7 @@ from torch.utils.data import Dataset
 class DiffuserDatasetClassif(Dataset):
    """Diffuser dataset."""
 
-   def __init__(self, csv_file, data_dir, label_file, num_data=None, transform=None, use_gpu = False, flipud_gt=False):
+   def __init__(self, csv_file, data_dir, labels, label_file=None, num_data=None, transform=None, use_gpu = False, flipud_gt=False):
        """
        Args:
            csv_file (string): Path to the csv file with annotations.
@@ -40,9 +40,12 @@ class DiffuserDatasetClassif(Dataset):
        self.label_dir = label_file
        self.transform = transform
        self.use_gpu = use_gpu
-       f = open(label_file)
-       self.labels = json.load(f)['gt']
-       f.close()
+       if label_file:
+           f = open(label_file)
+           self.labels = json.load(f)['gt']
+           f.close()
+       else:
+           self.labels = labels
 
    def __len__(self):
        return len(self.csv_contents)
