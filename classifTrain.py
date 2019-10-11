@@ -26,7 +26,7 @@ def main(args):
     model = resnet18(num_classes=14)
     if use_gpu:
         model = model.cuda()
-    lossfn = nn.MultiLabelSoftMarginLoss()
+    lossfn = nn.BCELoss()
     optimizer = optim.Adam(model.parameters())
     train(model, optimizer, lossfn, args.num_epochs)
     test(model, lossfn)
@@ -57,7 +57,7 @@ def train(model, optimizer, lossfn, num_epochs):
 
             # print statistics
             running_loss += loss.item()
-            if i % 500 == 499:  # print every 2000 mini-batches
+            if i % 50 == 49:  # print every 2000 mini-batches
                 j += 500
                 print('[%d, %5d] loss: %.3f' %
                         (epoch + 1, i + 1, running_loss / 500))
@@ -90,40 +90,40 @@ def test(model, loss_fn):
             labels_lst.append(labels.cpu().numpy())
             outputs_lst.append(outputs.cpu().numpy())
 
-    np.save("labels.npy", np.array(labels_lst))
-    np.save("outputs.npy", np.array(outputs_lst))
-    cm_dict, total_acc = confusion_matrix(labels_lst, outputs_lst)
+    labels, outputs = np.concatenate(labels_lst), np.concatenate(outputs_lst)
+    np.save("labels.npy", labels)
+    np.save("outputs.npy", outputs) 
+    cm_dict, total_acc = confusion_matrix(labels, outputs)
     print("Avg loss on test set: {}".format(sum(losses)/len(losses)))
     print("Total accuracy on test set: {}".format(total_acc))
     with open(args.save_name, 'w') as fp:
         json.dump(cm_dict, fp)
 
-def confusion_matrix(labels_lst, outputs_lst):
+def confusion_matrix(labels, outputs):
     results = [[] for _ in range(len(filenames))]
     tp = [0 for _ in range(len(filenames))]
     tn = [0 for _ in range(len(filenames))]
     fp = [0 for _ in range(len(filenames))]
     fn = [0 for _ in range(len(filenames))]
-    for i in range(len(labels_lst)):
-        ll, ol = labels_lst[i], outputs_lst[i]
-        for j in ll:
-            if ol[j] == 1 and ll[j] >= .2:
+    for i in range(len(labels)):
+        ll, ol = labels[i], outputs[i]
+        for j in range(len(ll)):
+            if ll[j] == 1 and ol[j] >= .2:
                 tp[j] += 1
                 results[j].append(1)
-            elif ol[j] == 0 and ll[j] < .2:
+            elif ll[j] == 0 and ol[j] < .2:
                 tn[j] += 1
                 results[j].append(1)
-            elif ol[j] == 0 and ll[j] >= .2:
+            elif ll[j] == 0 and ol[j] >= .2:
                 fp[j] += 1
                 results[j].append(0)
-            elif ol[j] == 1 and ll[j] < .2:
+            elif ll[j] == 1 and ol[j] < .2:
                 fn[j] += 1
                 results[j].append(0)
-
-    accs = [r / len(r) for r in results]
-    total_acc = sum([sum(r) for r in results]) / sum([sum(r) for r in results])
+    accs = [sum(r) / len(r) for r in results]
+    total_acc = sum([sum(r) for r in results]) / sum([len(r) for r in results])
     cm_dict = {filenames[i] : {'tp': tp[i], 'tn': tn[i], 'fp': fp[i],
-                               'fn': fn[i], 'accuracy' : accs[i]} for _ in range(filenames)}
+                               'fn': fn[i], 'accuracy' : accs[i]} for i in range(len(filenames))}
     return cm_dict, total_acc
 
 
@@ -135,13 +135,13 @@ if __name__ == '__main__':
     parser.add_argument("--test_names", type=str)
     parser.add_argument("--num_epochs", type=int)
     parser.add_argument("--batch_size", type=int)
-    parser.add_argument("--save_name", type=int)
+    parser.add_argument("--save_name", type=str)
     args = parser.parse_args()
     use_gpu = torch.cuda.is_available()
     print(use_gpu)
 
     trans = transforms.Compose([transforms.ToTensor()])
-    train_set = DiffuserDatasetClassif(args.train_names, args.image_dir, args.gt_file, transform=trans)
-    test_set = DiffuserDatasetClassif(args.test_names, args.image_dir, args.gt_file, transform=trans)
+    train_set = DiffuserDatasetClassif(args.train_names, args.image_dir, args.gt_file, transform=trans, use_gpu=use_gpu)
+    test_set = DiffuserDatasetClassif(args.test_names, args.image_dir, args.gt_file, transform=trans, use_gpu=use_gpu)
 
     main(args)
