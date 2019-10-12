@@ -9,9 +9,7 @@ import torchvision.transforms as transforms
 
 
 
-filenames = ['baby_r1.txt',  'bird_r1.txt', 'car_r1.txt', 'clouds_r1.txt', 'dog_r1.txt',
-             'female_r1.txt',  'flower_r1.txt',  'male_r1.txt',  'night_r1.txt', 'people_r1.txt',
-             'portrait_r1.txt',  'river_r1.txt',  'sea_r1.txt',  'tree_r1.txt']
+num_images = 25000
 
 
 
