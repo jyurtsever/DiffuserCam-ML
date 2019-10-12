@@ -148,9 +148,9 @@ if __name__ == '__main__':
     parser.add_argument("--num_epochs", type=int)
     parser.add_argument("--batch_size", type=int)
     parser.add_argument("--save_name", type=str)
+    parser.add_argument("--ann_dir", type=str, default="~/research/mirflickr25k/annotations")
     parser.add_argument('cats', metavar='N', type=str, nargs='+',
                         help='an integer for the accumulator')
-
     args = parser.parse_args()
     use_gpu = torch.cuda.is_available()
 
