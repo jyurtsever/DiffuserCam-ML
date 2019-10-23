@@ -215,9 +215,12 @@ def resnet18(pretrained=False, **kwargs):
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = ResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
     if pretrained:
+        model = ResNet(BasicBlock, [2, 2, 2, 2])
         model.load_state_dict(model_zoo.load_url(model_urls['resnet18']))
+        model.fc = nn.Linear(512 * BasicBlock.expansion, kwargs['num_classes'])
+    else: 
+        model = ResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
     return model
 
 
@@ -231,6 +234,7 @@ def Resnet18Templet(input_channel, pretrained=False, **kwargs):
     if pretrained:
         model_dict = LoadPretrainedModel(model, model_zoo.load_url(model_urls['resnet18']))
         model.load_state_dict(model_dict)
+    
     return model
 
 

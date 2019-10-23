@@ -23,7 +23,7 @@ from torch.utils.data import Dataset
 class DiffuserDatasetClassif(Dataset):
    """Diffuser dataset."""
 
-   def __init__(self, csv_file, data_dir, labels, label_file=None, num_data=None, transform=None, use_gpu = False, flipud_gt=False):
+   def __init__(self, csv_file, data_dir, labels, suffix='.tiff', label_file=None, num_data=None, transform=None, use_gpu = False, flipud_gt=False):
        """
        Args:
            csv_file (string): Path to the csv file with annotations.
@@ -40,6 +40,7 @@ class DiffuserDatasetClassif(Dataset):
        self.label_dir = label_file
        self.transform = transform
        self.use_gpu = use_gpu
+       self.suffix = suffix
        if label_file:
            f = open(label_file)
            self.labels = json.load(f)['gt']
@@ -52,6 +53,8 @@ class DiffuserDatasetClassif(Dataset):
 
    def __getitem__(self, idx):
        def initialize_img(path, flip=False):
+           if self.suffix != '.tiff':
+               path = path[:-5] + self.suffix
            if flip:
                img = np.flipud(cv2.imread(path, -1)).astype(np.float32) / 512
            else:
