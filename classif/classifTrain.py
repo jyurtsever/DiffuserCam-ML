@@ -1,5 +1,5 @@
 from resnet import *
-from classifiers import *
+from classif.classifiers import *
 from torch import nn, optim
 import torch
 import matplotlib.pyplot as plt
@@ -143,18 +143,18 @@ def get_labels(filenames):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--gt_file", type=str)
-    parser.add_argument("--image_dir", type=str)
-    parser.add_argument("--train_names", type=str)
-    parser.add_argument("--test_names", type=str)
-    parser.add_argument("--num_epochs", type=int)
-    parser.add_argument("--batch_size", type=int)
-    parser.add_argument("--save_name", type=str)
-    parser.add_argument("--ann_dir", type=str, default="../mirflickr25k/annotations/")
+    parser.add_argument("-gt_file", type=str)
+    parser.add_argument("-image_dir", type=str)
+    parser.add_argument("-train_names", type=str)
+    parser.add_argument("-test_names", type=str)
+    parser.add_argument("-num_epochs", type=int)
+    parser.add_argument("-batch_size", type=int)
+    parser.add_argument("-save_name", type=str)
+    parser.add_argument("-ann_dir", type=str, default="../mirflickr25k/annotations/")
     parser.add_argument('cats', metavar='N', type=str, nargs='+',
                         help='an integer for the accumulator')
-    parser.add_argument("--suffix", type=str, default=".tiff")
-    parser.add_argument("--use_pretrained", type=bool, default=False)
+    parser.add_argument("-suffix", type=str, default=".tiff")
+    parser.add_argument("-use_pretrained", type=bool, default=False)
     args = parser.parse_args()
     use_gpu = torch.cuda.is_available()
 
