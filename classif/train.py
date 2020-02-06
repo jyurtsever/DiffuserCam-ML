@@ -65,11 +65,11 @@ def train(model, optimizer, lossfn, num_epochs, trainloader, testloader):
         test(model, lossfn, trainloader, set_name='training set')
         test(model, lossfn, testloader)
     print('Finished Training')
-    # torch.save({
-    #     'epoch': epoch,
-    #     'model_state_dict': model.state_dict(),
-    #     'optimizer_state_dict': optimizer.state_dict(),
-    # }, "saved_network.pt")
+    torch.save({
+        'epoch': epoch,
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+    }, "saved_network.pt")
     np.save(args.save_name + "_losses.npy", np.array(losses))
     np.save(args.save_name + "_iterations.npy", iterations)
     return model, losses, iterations
@@ -159,12 +159,12 @@ def train_test_names(args,frac_test=.1):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-gt_file", type=str)
+    # parser.add_argument("-gt_file", type=str)
     parser.add_argument("-root", type=str)
     # parser.add_argument("-train_names", type=str)
     # parser.add_argument("-test_names", type=str)
-    parser.add_argument("-num_epochs", type=int)
-    parser.add_argument("-batch_size", type=int)
+    parser.add_argument("-num_epochs", type=int, default=10)
+    parser.add_argument("-batch_size", type=int, default=20)
     parser.add_argument("-save_name", type=str)
     parser.add_argument("-seed", type=int, default=2)
     # parser.add_argument("-ann_dir", type=str, default="../mirflickr25k/annotations/")
