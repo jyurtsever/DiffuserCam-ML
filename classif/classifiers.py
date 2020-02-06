@@ -16,6 +16,7 @@ import cv2
 
 from sklearn.model_selection import train_test_split
 from torch.autograd import Variable
+from collections import defaultdict
 from torch.utils.data import Dataset
 
 
@@ -78,6 +79,71 @@ class DiffuserDatasetClassif(Dataset):
        sample = {'image': image, 'label': label}
 
        return sample
+
+
+class ImagenetDiffuserDataset(Dataset):
+   """Diffuser dataset."""
+
+   def __init__(self, csv_file, data_dir, classes, suffix='.tiff', label_file=None, num_data=None, transform=None,
+                use_gpu = False, flipud_gt=False):
+        """
+        Args:
+           data_dir (string): Directory with all the Diffuser images.
+           transform (callable, optional): Optional transform to be applied
+               on a sample.
+        """
+        # if num_data:
+        #     self.csv_contents = pd.read_csv(csv_file, nrows=num_data)
+        # else:
+        self.paths = pd.read_csv(csv_file)
+        self.data_dir = data_dir
+        self.label_dir = label_file
+        self.transform = transform
+        self.use_gpu = use_gpu
+        self.class2arr = defaultdict(lambda : [0]*len(classes))
+        for i, class_name in enumerate(classes):
+            self.class2arr[class_name][i] = 1
+
+   def __len__(self):
+       return len(self.paths)
+
+   def __getitem__(self, idx):
+       def initialize_img(path, flip=False):
+           # if self.suffix != '.tiff':
+           #     path = path[:-5] + self.suffix
+           if flip:
+               img = np.flipud(cv2.imread(path, -1)).astype(np.float32) / 512
+           else:
+               img = cv2.imread(path, -1).astype(np.float32)/512
+           if len(img.shape) > 2 and img.shape[2] == 4:
+               img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
+           return img
+
+       def get_label(img_name):
+           class_name =  os.path.basename(os.path.join(self.data_dir, img_name))
+           class_arr = self.class2int[class_name]
+           return class_arr
+
+       img_name = self.paths.iloc[idx]
+
+       image = initialize_img(os.path.join(self.data_dir, img_name))
+       label = get_label(img_name)
+       label = torch.FloatTensor(label)
+
+       if self.transform:
+           image = self.transform(image)
+
+       if self.use_gpu:
+           image = image.cuda()
+           label = label.cuda()
+
+       sample = {'image': image, 'label': label}
+
+       return sample
+
+
+
+
 
 class FLIP(object):
    """Convert ndarrays in sample to Tensors."""

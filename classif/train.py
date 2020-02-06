@@ -18,7 +18,7 @@ def imshow(img):
 
 
 def main(args):
-    model = resnet18(pretrained=args.use_pretrained, num_classes=len(filenames))
+    model = resnet18(pretrained=args.use_pretrained, num_classes=len(classes))
     if use_gpu:
         model = model.cuda()
     lossfn = nn.BCELoss()
@@ -99,12 +99,13 @@ def test(model, loss_fn, testloader, set_name='test set'):
         json.dump(cm_dict, fp)
 
 
+# Returns
 def confusion_matrix(labels, outputs, thresh=.2):
-    results = [[] for _ in range(len(filenames))]
-    tp = [0 for _ in range(len(filenames))]
-    tn = [0 for _ in range(len(filenames))]
-    fp = [0 for _ in range(len(filenames))]
-    fn = [0 for _ in range(len(filenames))]
+    results = [[] for _ in range(len(classes))]
+    tp = [0 for _ in range(len(classes))]
+    tn = [0 for _ in range(len(classes))]
+    fp = [0 for _ in range(len(classes))]
+    fn = [0 for _ in range(len(classes))]
     for i in range(len(labels)):
         ll, ol = labels[i], outputs[i]
         for j in range(len(ll)):
@@ -122,51 +123,71 @@ def confusion_matrix(labels, outputs, thresh=.2):
                 results[j].append(0)
     accs = [sum(r) / len(r) for r in results]
     total_acc = sum([sum(r) for r in results]) / sum([len(r) for r in results])
-    cm_dict = {filenames[i]: {'tp': tp[i], 'tn': tn[i], 'fp': fp[i],
-                              'fn': fn[i], 'accuracy': accs[i]} for i in range(len(filenames))}
+    cm_dict = {classes[i]: {'tp': tp[i], 'tn': tn[i], 'fp': fp[i],
+                            'fn': fn[i], 'accuracy': accs[i]} for i in range(len(classes))}
     return cm_dict, total_acc
 
 
-def get_labels(filenames):
-    num_class = len(filenames)
-    gt = [[0 for _ in range(num_class)] for _ in range(0, num_images + 1)]
-    for i, name in enumerate(filenames):
-        f = open(args.ann_dir + name, 'r')
-        for line in f:
-            gt[int(line.strip())][i] = 1
-        f.close()
-    data = []
-    for im_num, class_lst in enumerate(gt):
-        im_filename = "im{:05}.tiff".format(im_num)
-        data.append({im_filename: class_lst})
-    return data
+# def get_labels(classes):
+#     num_class = len(classes)
+#     gt = [[0 for _ in range(num_class)] for _ in range(0, num_images + 1)]
+#     for i, name in enumerate(classes):
+#         f = open(args.ann_dir + name, 'r')
+#         for line in f:
+#             gt[int(line.strip())][i] = 1
+#         f.close()
+#     data = []
+#     for im_num, class_lst in enumerate(gt):
+#         im_filename = "im{:05}.tiff".format(im_num)
+#         data.append({im_filename: class_lst})
+#     return data
+
+
+# Given root dir with
+def train_test_names(args,frac_test=.1):
+    train_test = []
+    for path, subdirs, files in os.walk(args.root):
+        for f in files:
+            train_test.append(os.path.join(os.path.basename(path), f))
+
+    random.shuffle(train_test)
+    div = int(frac_test*len(train_test)) + 1
+    test, train = train_test[:div], train_test[div:]
+
+    return test, train
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-gt_file", type=str)
-    parser.add_argument("-image_dir", type=str)
-    parser.add_argument("-train_names", type=str)
-    parser.add_argument("-test_names", type=str)
+    parser.add_argument("-root", type=str)
+    # parser.add_argument("-train_names", type=str)
+    # parser.add_argument("-test_names", type=str)
     parser.add_argument("-num_epochs", type=int)
     parser.add_argument("-batch_size", type=int)
     parser.add_argument("-save_name", type=str)
-    parser.add_argument("-ann_dir", type=str, default="../mirflickr25k/annotations/")
-    parser.add_argument('cats', metavar='N', type=str, nargs='+',
-                        help='an integer for the accumulator')
+    parser.add_argument("-seed", type=int, default=2)
+    # parser.add_argument("-ann_dir", type=str, default="../mirflickr25k/annotations/")
+    # parser.add_argument('cats', metavar='N', type=str, nargs='+',
+    #                     help='an integer for the accumulator')
     parser.add_argument("-suffix", type=str, default=".tiff")
     parser.add_argument("-use_pretrained", type=bool, default=False)
     args = parser.parse_args()
     use_gpu = torch.cuda.is_available()
 
-    filenames = args.cats
-    labels = get_labels(filenames)
+    # classes = args.cats
+    # labels = get_labels(classes)
+    classes = os.listdir(args.root)
+    random.seed(a=args.seed)
     print(use_gpu)
+    print("making labels")
+    test_names, train_names = train_test_names(args)
+    print("labels maqe")
 
     trans = transforms.Compose([transforms.ToTensor()])
-    train_set = DiffuserDatasetClassif(args.train_names, args.image_dir, labels, suffix=args.suffix, transform=trans,
+    train_set = ImagenetDiffuserDataset(train_names, args.image_dir, classes, suffix=args.suffix, transform=trans,
+                                        use_gpu=use_gpu)
+    test_set = ImagenetDiffuserDataset(test_names, args.image_dir, classes, suffix=args.suffix, transform=trans,
                                        use_gpu=use_gpu)
-    test_set = DiffuserDatasetClassif(args.test_names, args.image_dir, labels, suffix=args.suffix, transform=trans,
-                                      use_gpu=use_gpu)
 
     main(args)
