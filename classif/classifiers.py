@@ -13,6 +13,7 @@ import scipy.misc as scm
 import matplotlib.pyplot as plt
 import matplotlib.image as img
 import cv2
+import skimage
 
 from sklearn.model_selection import train_test_split
 from torch.autograd import Variable
@@ -84,7 +85,7 @@ class DiffuserDatasetClassif(Dataset):
 class ImagenetDiffuserDataset(Dataset):
    """Diffuser dataset."""
 
-   def __init__(self, csv_file, data_dir, classes, suffix='.tiff', label_file=None, num_data=None, transform=None,
+   def __init__(self, paths, data_dir, classes, suffix='.tiff', label_file=None, num_data=None, transform=None,
                 use_gpu = False, flipud_gt=False):
         """
         Args:
@@ -95,7 +96,7 @@ class ImagenetDiffuserDataset(Dataset):
         # if num_data:
         #     self.csv_contents = pd.read_csv(csv_file, nrows=num_data)
         # else:
-        self.paths = pd.read_csv(csv_file)
+        self.paths = paths 
         self.data_dir = data_dir
         self.label_dir = label_file
         self.transform = transform
@@ -103,7 +104,6 @@ class ImagenetDiffuserDataset(Dataset):
         self.class2arr = defaultdict(lambda : [0]*len(classes))
         for i, class_name in enumerate(classes):
             self.class2arr[class_name][i] = 1
-
    def __len__(self):
        return len(self.paths)
 
@@ -115,16 +115,19 @@ class ImagenetDiffuserDataset(Dataset):
                img = np.flipud(cv2.imread(path, -1)).astype(np.float32) / 512
            else:
                img = cv2.imread(path, -1).astype(np.float32)/512
+           if img.shape[-1] != 3:
+               img = skimage.color.gray2rgb(img)
+    
            if len(img.shape) > 2 and img.shape[2] == 4:
                img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
            return img
 
        def get_label(img_name):
-           class_name =  os.path.basename(os.path.join(self.data_dir, img_name))
-           class_arr = self.class2int[class_name]
+           class_name =  os.path.dirname(img_name)
+           class_arr = self.class2arr[class_name]
            return class_arr
 
-       img_name = self.paths.iloc[idx]
+       img_name = self.paths[idx]
 
        image = initialize_img(os.path.join(self.data_dir, img_name))
        label = get_label(img_name)

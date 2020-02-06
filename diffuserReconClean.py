@@ -14,7 +14,7 @@ import sys, os
 
 ####        INITIALIZE        #####
 def initialize(image_file, psf_file, f_lat = 1, f_ax = 1, type = 'pco', color = 'rgb', dim = '2d', ind = 0):
-    
+    print(image_file)
     im_type = image_file[-3:]
     psf_type = psf_file[-3:]
     # image = np.array(np.load(image_file))
@@ -115,11 +115,11 @@ def run_recon_and_crop(num_photos, max_itr, im_path, gt_path, save_path, start=1
     for i in range(start, start + num_photos):
         # enablePrint()
         print('photo ', i, ' of ', num_photos + start, '\n\n', end="\r")
-        if sys.argv[5] == 'mat': 
-            im_file = im_path + 'face' + str(i) + '.mat'
-        else:
-            im_file = im_path + 'im' + str(i) + '.jpg.tiff'
-        gt_file = gt_path + 'im' + str(i) + '.jpg.tiff'
+        #if sys.argv[5] == 'mat': 
+        #    im_file = im_path + 'face' + str(i) + '.mat'
+        #else:
+        im_file = im_path + 'im' + str(i) + '.tiff'
+        gt_file = gt_path + 'im' + str(i) + '.tiff'
         save_file_diffuser = None #save_path + 'recon/im' + str(i) + '.tiff'
         crp_path = save_path + 'im' + str(i) + '.tiff'
         save_file_gt = save_path + 'gt/im' + str(i) + '.tiff'

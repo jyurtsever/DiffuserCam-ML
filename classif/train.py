@@ -1,5 +1,5 @@
 from resnet import *
-from classif.classifiers import *
+from classifiers import *
 from torch import nn, optim
 import torch
 import matplotlib.pyplot as plt
@@ -55,11 +55,12 @@ def train(model, optimizer, lossfn, num_epochs, trainloader, testloader):
 
             # print statistics
             running_loss += loss.item()
-            if i % 50 == 49:  # print every 2000 mini-batches
-                j += 50
+            interval = 500 
+            if i % interval == interval - 1:  # print every 2000 mini-batches
+                j += interval
                 print('[%d, %5d] loss: %.3f' %
-                      (epoch + 1, i + 1, running_loss / 50))
-                losses.append(running_loss / 50)
+                      (epoch + 1, i + 1, running_loss / interval))
+                losses.append(running_loss / interval)
                 iterations.append(j)
                 running_loss = 0.0
         test(model, lossfn, trainloader, set_name='training set')
@@ -69,7 +70,7 @@ def train(model, optimizer, lossfn, num_epochs, trainloader, testloader):
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
-    }, "saved_network.pt")
+    }, args.save_name + "saved_network.pt")
     np.save(args.save_name + "_losses.npy", np.array(losses))
     np.save(args.save_name + "_iterations.npy", iterations)
     return model, losses, iterations
@@ -164,7 +165,7 @@ if __name__ == '__main__':
     # parser.add_argument("-train_names", type=str)
     # parser.add_argument("-test_names", type=str)
     parser.add_argument("-num_epochs", type=int, default=10)
-    parser.add_argument("-batch_size", type=int, default=20)
+    parser.add_argument("-batch_size", type=int, default=1)
     parser.add_argument("-save_name", type=str)
     parser.add_argument("-seed", type=int, default=2)
     # parser.add_argument("-ann_dir", type=str, default="../mirflickr25k/annotations/")
@@ -185,9 +186,9 @@ if __name__ == '__main__':
     print("labels maqe")
 
     trans = transforms.Compose([transforms.ToTensor()])
-    train_set = ImagenetDiffuserDataset(train_names, args.image_dir, classes, suffix=args.suffix, transform=trans,
+    train_set = ImagenetDiffuserDataset(train_names, args.root, classes, suffix=args.suffix, transform=trans,
                                         use_gpu=use_gpu)
-    test_set = ImagenetDiffuserDataset(test_names, args.image_dir, classes, suffix=args.suffix, transform=trans,
+    test_set = ImagenetDiffuserDataset(test_names, args.root, classes, suffix=args.suffix, transform=trans,
                                        use_gpu=use_gpu)
 
     main(args)
