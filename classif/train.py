@@ -55,11 +55,11 @@ def train(model, optimizer, lossfn, num_epochs, trainloader, testloader):
 
             # print statistics
             running_loss += loss.item()
-            interval = 500 
+            interval = int(1000/args.batch_size) 
             if i % interval == interval - 1:  # print every 2000 mini-batches
                 j += interval
                 print('[%d, %5d] loss: %.3f' %
-                      (epoch + 1, i + 1, running_loss / interval))
+                      (epoch + 1, i*args.batch_size + 1, running_loss / interval))
                 losses.append(running_loss / interval)
                 iterations.append(j)
                 running_loss = 0.0
