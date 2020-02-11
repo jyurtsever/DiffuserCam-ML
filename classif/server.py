@@ -119,7 +119,7 @@ if __name__ == '__main__':
 
     # Read the network from Memory
     print("Initializing Model")
-    net = resnet18(pretrained=args.use_pretrained, num_classes=len(classes))
+    net = resnet18(num_classes=len(classes))
     net.load_state_dict(torch.load(args.model_file)['model_state_dict'])
     use_gpu = torch.cuda.is_available()
     if use_gpu:
