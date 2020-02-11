@@ -70,7 +70,7 @@ def train(model, optimizer, lossfn, num_epochs, trainloader, testloader):
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
-    }, args.save_name + "saved_network.pt")
+    }, args.save_name + "_saved_network.pt")
     np.save(args.save_name + "_losses.npy", np.array(losses))
     np.save(args.save_name + "_iterations.npy", iterations)
     return model, losses, iterations
@@ -184,7 +184,7 @@ if __name__ == '__main__':
     print("making labels")
     test_names, train_names = train_test_names(args)
     print("labels maqe")
-
+    args.save_name = 'results/' + args.save_name
     trans = transforms.Compose([transforms.ToTensor()])
     train_set = ImagenetDiffuserDataset(train_names, args.root, classes, suffix=args.suffix, transform=trans,
                                         use_gpu=use_gpu)
