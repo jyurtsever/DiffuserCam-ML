@@ -9,6 +9,7 @@ import argparse
 import imagiz
 import torch
 import cv2
+import torchvision.transforms as transforms
 from resnet import *
 
 
@@ -31,7 +32,7 @@ def initialize(frame, flip=False):
 
     if len(img.shape) > 2 and img.shape[2] == 4:
         img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
-    return img
+    return trans(img)
 
 def net_forward(frame):
     inWidth = frame.shape[1]
@@ -125,6 +126,7 @@ if __name__ == '__main__':
     if use_gpu:
         net = net.cuda()
     net.eval()
+    trans = transforms.Compose([transforms.ToTensor()])
 
     print("Model created")
     s.listen(1)
