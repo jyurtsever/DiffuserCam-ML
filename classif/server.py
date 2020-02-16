@@ -24,9 +24,9 @@ ARR_PORT = 8097
 
 def initialize(frame, flip=False):
     if flip:
-        img = np.flipud(frame).astype(np.float32) / 512
+        img = np.flipud(frame[:, :, ::-1]).astype(np.float32) / 512
     else:
-        img = frame.astype(np.float32) / 512
+        img = frame[:, :, ::-1].astype(np.float32) / 512
     if img.shape[-1] != 3:
         img = skimage.color.gray2rgb(img)
 
@@ -37,18 +37,19 @@ def initialize(frame, flip=False):
 def net_forward(frame):
     inWidth = frame.shape[1]
     inHeight = frame.shape[0]
-    image = initialize(frame)
+    image = initialize(frame).unsqueeze(0)
     if use_gpu:
         image = image.cuda()
-    out = net(image).cpu().numpy()
-    return out
+    print(image.shape)
+    out = net(image).cpu().detach().numpy()
+    return out[0]
 
 
 def get_classes(out):
     res = []
     for i, prob in enumerate(out):
         if prob > args.thresh:
-            res.append(classes[i])
+            res.append((classes[i], prob))
     return res
 # def get_points(out, frame):
 #     inWidth = frame.shape[1]

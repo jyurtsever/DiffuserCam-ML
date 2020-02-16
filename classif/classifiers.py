@@ -139,6 +139,7 @@ class ImagenetDiffuserDataset(Dataset):
        if self.use_gpu:
            image = image.cuda()
            label = label.cuda()
+       print(image.size())
 
        sample = {'image': image, 'label': label}
 
