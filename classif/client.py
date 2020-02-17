@@ -29,7 +29,7 @@ def main():
     while True:
         try:
             r, frame = vid.read()
-            frame = rescale(frame, .45)
+            frame = rescale(frame, .45, width=500)
             if r:
                 r, image = cv2.imencode('.jpg', frame, encode_param)
                 client.send(image)
@@ -88,8 +88,11 @@ def show_frame(frame):
 """Recizes image according by the decimal scale (e.g .5)"""
 
 
-def rescale(img, scale):
-    width = int(img.shape[1] * scale)
+def rescale(img, scale, width=None):
+    if width:
+        scale = width/img.shape[1]
+    else:
+        width = int(img.shape[1] * scale)
     height = int(img.shape[0] * scale)
     dim = (width, height)
     # resize image
