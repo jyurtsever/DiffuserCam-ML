@@ -40,7 +40,7 @@ def net_forward(frame):
     image = initialize(frame).unsqueeze(0)
     if use_gpu:
         image = image.cuda()
-    print(image.shape)
+    #print(image.shape)
     out = net(image).cpu().detach().numpy()
     return out[0]
 
@@ -108,7 +108,7 @@ if __name__ == '__main__':
     parser.add_argument("-thresh", type=float, default=.2)
     parser.add_argument("-model_file", type=str)
     args = parser.parse_args()
-    classes = os.listdir(args.root)
+    classes = ['bike', 'car', 'bird', 'fish', 'mammal', 'tree', 'boat', 'musical_instrument']#os.listdir(args.root)
 
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
