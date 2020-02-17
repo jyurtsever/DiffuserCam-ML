@@ -4,13 +4,13 @@ import os
 import torchvision
 import torch.nn as nn
 import numpy as np
+import requests
 import skimage
 import argparse
 import imagiz
 import torch
 import cv2
-import torchvision.transforms as transforms
-from resnet import *
+from torchvision import models, transforms
 
 
 HOST = ''
@@ -22,35 +22,23 @@ ARR_PORT = 8097
 #               'Left Hip', 'Left Knee', 'LAnkle', 'Right Eye', 'Left Eye', 'Right Ear', 'Left Ear', 'Background']
 
 
-def initialize(frame, flip=False):
-    if flip:
-        img = np.flipud(frame[:, :, ::-1]).astype(np.float32) / 512
-    else:
-        img = frame[:, :, ::-1].astype(np.float32) / 512
-    if img.shape[-1] != 3:
-        img = skimage.color.gray2rgb(img)
-
-    if len(img.shape) > 2 and img.shape[2] == 4:
-        img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
-    return trans(img)
+# def initialize(frame, flip=False):
+#     return trans(frame)
 
 def net_forward(frame):
-    inWidth = frame.shape[1]
-    inHeight = frame.shape[0]
-    image = initialize(frame).unsqueeze(0)
+    image = trans(frame).view(1, 3, 224, 224)
     if use_gpu:
         image = image.cuda()
+
     #print(image.shape)
     out = net(image).cpu().detach().numpy()
     return out[0]
 
 
 def get_classes(out):
-    res = []
-    for i, prob in enumerate(out):
-        if prob > args.thresh:
-            res.append((classes[i], prob))
-    return res
+    _, indices = torch.sort(out, descending=True)
+    percentage = torch.nn.functional.softmax(out, dim=1)[0]
+    return [(classes[idx], percentage[idx].item()) for idx in indices[0][:5]]
 
 def main():
     print("Connecting...")
@@ -60,15 +48,15 @@ def main():
         try:
             message = server.receive()
             frame = cv2.imdecode(message.image,1)
-            ###Send
+
             out = net_forward(frame)
             picked_classes = get_classes(out)
-            # pts = get_points(out, frame)
-            # data_string = pickle.dumps(pts)
+
             data_string = pickle.dumps(picked_classes)
-            # data_string_2 = pickle.dumps(pts, protocol=2)
+
+            ###Send
             conn.send(data_string)
-            # conn2.send(data_string_2)
+
             cv2.waitKey(1)
         except KeyboardInterrupt:
             s.close()
@@ -77,37 +65,39 @@ def main():
     print("\nSession Ended")
 
 if __name__ == '__main__':
-    #parsing arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-root", type=str)
-    parser.add_argument("-thresh", type=float, default=.2)
-    parser.add_argument("-model_file", type=str)
-    args = parser.parse_args()
-    classes = ['bike', 'car', 'bird', 'fish', 'mammal', 'tree', 'boat', 'musical_instrument']#os.listdir(args.root)
-
-
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # s2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
     print('Socket created')
 
     s.bind((HOST, ARR_PORT))
-    # s2.bind((HOST, ARR_PORT_2))
+
     print('Socket bind complete')
 
     # Read the network from Memory
     print("Initializing Model")
-    net = resnet18(num_classes=len(classes))
-    net.load_state_dict(torch.load(args.model_file)['model_state_dict'])
+    net = models.resnet18(pretrained=True, num_classes=1000)
+
     use_gpu = torch.cuda.is_available()
     if use_gpu:
         net = net.cuda()
     net.eval()
-    trans = transforms.Compose([transforms.ToTensor()])
+
+    trans = transforms.Compose([
+        transforms.Scale(224),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        # from http://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html
+    ])
+
+    url = 'https://gist.githubusercontent.com/yrevar/942d3a0ac09ec9e5eb3a/' \
+          'raw/596b27d23537e5a1b5751d2b0481ef172f58b539/imagenet1000_clsid_to_human.txt'
+
+    classes = eval(requests.get(url).content)
 
     print("Model created")
     s.listen(1)
-    # s2.listen(1)
     print('Socket now listening')
     conn, addr = s.accept()
-    # conn2, addr2 = s2.accept()
+
     main()
