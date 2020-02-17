@@ -10,8 +10,9 @@ import argparse
 import imagiz
 import torch
 import cv2
+import time
 from torchvision import models, transforms
-
+from PIL import Image
 
 HOST = ''
 IMG_PORT = 8098
@@ -26,19 +27,20 @@ ARR_PORT = 8097
 #     return trans(frame)
 
 def net_forward(frame):
-    image = trans(frame).view(1, 3, 224, 224)
+    image = Image.fromarray(frame)
+    image = trans(image).view(1, 3, 224, 224)
     if use_gpu:
         image = image.cuda()
 
     #print(image.shape)
-    out = net(image).cpu().detach().numpy()
-    return out[0]
+    out = net(image).cpu() #.detach().numpy()
+    return out #[0]
 
 
 def get_classes(out):
     _, indices = torch.sort(out, descending=True)
     percentage = torch.nn.functional.softmax(out, dim=1)[0]
-    return [(classes[idx], percentage[idx].item()) for idx in indices[0][:5]]
+    return [(classes[idx.item()], round(percentage[idx.item()].item(),2)) for idx in indices[0][:3]]
 
 def main():
     print("Connecting...")
