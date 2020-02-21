@@ -4,10 +4,7 @@ import random
 import shutil
 
 
-
 def main(args):
-    # file_names_gt = os.listdir(args.gt_folder)
-    # file_names_diffuser = os.listdir(args.diffuser_folder)
     train_dir = args.root + 'train'
     val_dir = args.root + 'val'
     if not os.path.isdir(train_dir):
@@ -27,12 +24,11 @@ def main(args):
             os.mkdir(val_dir + sub_folder)
 
         random.shuffle(files)
-        val_files = files[:int(len(files)* args.frac_validation)]
+        val_files = files[:int(len(files) * args.frac_validation)]
         for val_file in val_files:
             shutil.move(path + '/' + val_file, val_dir + '/' + val_file)
 
         shutil.move(path, train_dir)
-
 
 
 if __name__ == '__main__':
