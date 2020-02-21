@@ -26,6 +26,7 @@ def main():
     encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
     # cache = {'Neck': None, 'Left Shoulder': None, 'Right Wrist': None, 'Left Wrist': None,
     #         'Right Elbow': None, 'Right Shoulder': None, 'Left Shoulder': None}
+    i = 0
     while True:
         try:
             r, frame = vid.read()
@@ -36,19 +37,12 @@ def main():
                 ### Recieve Array
                 data = s.recv(4096)
                 class_names = pickle.loads(data)
-                if class_names:
+                if class_names and i % 5 == 0:
                     print(class_names)
                 else:
                     print("Not classiied")
                 show_frame(frame)
-
-                # time.sleep(1)
-                # points = pickle.loads(data)
-                # if points:
-                #     show_points(points, frame)
-                #     set_cache(points, cache)
-                #     if all_seen(cache):
-                #     	move_joints(cache)
+                i += 1
             else:
                 break
 
@@ -57,23 +51,6 @@ def main():
             vid.release()
             cv2.destroyAllWindows()
             break
-
-# """Sets the necessary body parts in the cache if openpose detects them"""
-#
-#
-# def set_cache(points, cache):
-# 	for i, pt in enumerate(points):
-# 		if pt and body_parts[i] in cache:
-# 			cache[body_parts[i]] = pt
-#
-# """Checks if all the body parts we need have been seen"""
-#
-#
-# def all_seen(cache):
-#     for k in cache.keys():
-#         if not cache[k]:
-#             return False
-#     return True
 
 
 """Displays Live Video In Opencv Window"""
