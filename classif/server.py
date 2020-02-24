@@ -14,6 +14,7 @@ import json
 import time
 from torchvision import models, transforms
 from PIL import Image
+from collections import OrderedDict
 
 HOST = ''
 IMG_PORT = 8098
@@ -67,6 +68,17 @@ def main():
             break
     print("\nSession Ended")
 
+def fix_state_dict(state_dict):
+    new_state_dict = OrderedDict()
+    for k, v in state_dict.items():
+        if k[:7] == 'module.':
+            name = k[7:] # remove `module.`
+        else:
+            name = k
+        new_state_dict[name] = v
+    return new_state_dict
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("model_dir", type=str)
@@ -86,7 +98,9 @@ if __name__ == '__main__':
     # Read the network from Memory
     print("Initializing Model")
     net = models.resnet18(num_classes=1000)
-    net.load_state_dict(torch.load(args.model_dir))
+    checkpoint = torch.load(args.model_dir)
+    #print(checkpoint.keys())
+    net.load_state_dict(fix_state_dict(checkpoint['state_dict']))
 
     use_gpu = torch.cuda.is_available()
     if use_gpu:
