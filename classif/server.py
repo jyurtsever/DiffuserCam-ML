@@ -85,7 +85,8 @@ if __name__ == '__main__':
 
     # Read the network from Memory
     print("Initializing Model")
-    net = models.resnet18(pretrained=True, num_classes=1000)
+    net = models.resnet18(num_classes=1000)
+    net.load_state_dict(torch.load(args.model_dir))
 
     use_gpu = torch.cuda.is_available()
     if use_gpu:
