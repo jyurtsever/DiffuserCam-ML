@@ -26,9 +26,9 @@ def main():
                 ### Recieve Array
                 data = s.recv(4096)
                 class_names = pickle.loads(data)
-                if class_names and i % 10 == 0:
+                if class_names and i % 20 == 0:
                     print(class_names)
-                else:
+                elif not class_names:
                     print("Not classiied")
                 show_frame(frame)
                 i += 1
