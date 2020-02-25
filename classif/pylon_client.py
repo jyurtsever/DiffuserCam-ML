@@ -36,7 +36,7 @@ def main():
                 ### Recieve Array
                 data = s.recv(4096)
                 class_names = pickle.loads(data)
-                if i % 20 == 0:
+                if i % 10 == 0:
                     if class_names:
                         print(class_names)
                     else:
