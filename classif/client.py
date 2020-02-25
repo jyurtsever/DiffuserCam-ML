@@ -11,21 +11,10 @@ IMG_PORT = 8098
 ARR_PORT = 8097
 
 
-# body_parts = ['Nose', 'Neck', 'Right Shoulder', 'Right Elbow', 'Right Wrist',
-#               'Left Shoulder', 'Left Elbow', 'Left Wrist', 'Right Hip', 'Right Knee', 'Right Ankle',
-#               'Left Hip', 'Left Knee', 'LAnkle', 'Right Eye', 'Left Eye', 'Right Ear', 'Left Ear', 'Background']
-#
-# body_dict = {body_parts[i]: i for i in range(len(body_parts))}
-
-
-
-
 def main():
     client = imagiz.Client("cc1",server_ip=HOST, server_port=IMG_PORT)
     vid = cv2.VideoCapture(0)
     encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
-    # cache = {'Neck': None, 'Left Shoulder': None, 'Right Wrist': None, 'Left Wrist': None,
-    #         'Right Elbow': None, 'Right Shoulder': None, 'Left Shoulder': None}
     i = 0
     while True:
         try:
@@ -37,7 +26,7 @@ def main():
                 ### Recieve Array
                 data = s.recv(4096)
                 class_names = pickle.loads(data)
-                if class_names and i % 5 == 0:
+                if class_names and i % 10 == 0:
                     print(class_names)
                 else:
                     print("Not classiied")
@@ -59,10 +48,9 @@ def main():
 def show_frame(frame):
     cv2.imshow("Frame", frame)
     cv2.waitKey(1)
- #   cv2.destroyAllWindows()
 
 
-"""Recizes image according by the decimal scale (e.g .5)"""
+"""Resizes image according by the decimal scale (e.g .5)"""
 
 
 def rescale(img, scale, width=None):

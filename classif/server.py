@@ -42,7 +42,7 @@ def net_forward(frame):
 def get_classes(out):
     _, indices = torch.sort(out, descending=True)
     percentage = torch.nn.functional.softmax(out, dim=1)[0]
-    return [(classes[idx.item()], round(percentage[idx.item()].item(),2)) for idx in indices[0][:3]]
+    return [(classes[idx.item()], round(percentage[idx.item()].item(),2)) for idx in indices[0][:7]]
 
 def main():
     print("Connecting...")
