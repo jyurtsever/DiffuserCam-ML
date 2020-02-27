@@ -7,6 +7,7 @@ import imagiz
 HOST = '128.32.112.46'
 IMG_PORT = 8098
 ARR_PORT = 8097
+RECON_PORT = 8099
 
 
 def main():
@@ -33,16 +34,26 @@ def main():
                 frame = rescale(frame, .45, width=480)
                 r, image = cv2.imencode('.jpg', frame, encode_param)
                 client.send(image)
-                ### Recieve Array
-                data = s.recv(4096)
-                class_names = pickle.loads(data)
-                if i % 10 == 0:
-                    if class_names:
-                        print(class_names)
-                    else:
-                        print("Not classiied")
-                show_frame(frame)
-                i += 1
+
+                from_server = ''
+                while True:
+                    data = s.recv(4096)
+                    if not data:
+                        break
+                    from_server += data
+
+                recon = cv2.imdecode(pickle.loads(from_server), 1)
+                show_frame(recon)
+                # ### Recieve Array
+                # data = s.recv(4096)
+                # class_names = pickle.loads(data)
+                # if i % 10 == 0:
+                #     if class_names:
+                #         print(class_names)
+                #     else:
+                #         print("Not classiied")
+                # show_frame(frame)
+                # i += 1
             grabResult.Release()
         except (KeyboardInterrupt, EOFError) as e:
             # Releasing the resource
