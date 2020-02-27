@@ -52,7 +52,8 @@ def get_classes(out):
 
 
 def get_recon(frame):
-    perm = frame.transpose((2, 0, 1))
+    frame_float = (frame/np.max(frame)).astype('float32') 
+    perm = torch.tensor(frame_float.transpose((2, 0, 1))).unsqueeze(0)
     with torch.no_grad():
         inputs = perm.to(my_device)
         out = admm_converged2(inputs)
@@ -71,7 +72,8 @@ def main():
             frame = cv2.imdecode(message.image,1)
 
             out = net_forward(frame)
-            recon = get_recon(frame, iterations=5)
+            recon = get_recon(frame)
+            recon = (recon*255).astype('uint8')
             r, recon_encode = cv2.imencode('.jpg', recon, encode_param)
 
             ###Send
