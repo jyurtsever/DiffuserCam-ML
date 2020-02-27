@@ -3,6 +3,7 @@ import cv2
 import pickle
 import socket
 import imagiz
+import struct
 
 HOST = '128.32.112.46'
 IMG_PORT = 8098
@@ -36,14 +37,19 @@ def main():
                 client.send(image)
 
                 from_server = b''
-                while True:
+
+                payload_size = struct.calcsize(">L")
+                while len(from_server) < payload_size:
                     data = s.recv(4096)
+                    print("yo")
                     if not data:
                         break
                     from_server += data
-
+                print('yo1')
                 recon = cv2.imdecode(pickle.loads(from_server), 1)
+                print('yo2')
                 show_frame(recon)
+                print('yo3')
                 # ### Recieve Array
                 # data = s.recv(4096)
                 # class_names = pickle.loads(data)

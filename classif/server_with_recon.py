@@ -11,6 +11,7 @@ import imagiz
 import torch
 import cv2
 import json
+import struct
 import time
 from torchvision import models, transforms
 from PIL import Image
@@ -64,7 +65,8 @@ def main():
             r, recon_encode = cv2.imencode('.jpg', recon, encode_param)
 
             ###Send
-            conn.send(pickle.dumps(recon_encode))
+            img_data_string = pickle.dumps(recon_encode)
+            conn.sendall(struct.pack(">L", len(img_data_string)) + img_data_string)
 
             # picked_classes = get_classes(out)
             #
