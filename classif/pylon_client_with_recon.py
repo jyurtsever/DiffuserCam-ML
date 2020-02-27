@@ -37,20 +37,7 @@ def main():
                 client.send(image)
 
                 recon = receive_img(data)
-                print('yo2')
                 show_frame(recon)
-                print('yo3')
-
-                # ### Recieve Array
-                # data = s.recv(4096)
-                # class_names = pickle.loads(data)
-                # if i % 10 == 0:
-                #     if class_names:
-                #         print(class_names)
-                #     else:
-                #         print("Not classiied")
-                # show_frame(frame)
-                # i += 1
             grabResult.Release()
         except (KeyboardInterrupt, EOFError) as e:
             # Releasing the resource

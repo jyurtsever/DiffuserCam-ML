@@ -176,7 +176,7 @@ if __name__ == '__main__':
 
     learning_options_none = {'learned_vars': var_options['plain_admm']}
 
-    admm_converged2 = admm_model_plain.ADMM_Net(batch_size=1, h=h, iterations=100,
+    admm_converged2 = admm_model_plain.ADMM_Net(batch_size=1, h=h, iterations=10,
                                                 learning_options=learning_options_none, cuda_device=my_device)
 
     admm_converged2.tau.data = admm_converged2.tau.data * 1000
