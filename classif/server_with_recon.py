@@ -156,8 +156,7 @@ if __name__ == '__main__':
     print("Creating Recon Model")
     my_device = 'cuda:0'
 
-    path_diffuser = 'sample_images/psf.tiff'
-    psf_diffuser = load_psf_image(path_diffuser, downsample=1, rgb=False)
+    psf_diffuser = load_psf_image(args.psf_file, downsample=1, rgb=False)
 
     ds = 4  # Amount of down-sampling.  Must be set to 4 to use dataset images
 
