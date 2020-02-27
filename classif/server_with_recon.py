@@ -109,7 +109,7 @@ if __name__ == '__main__':
     parser.add_argument("model_dir", type=str)
     parser.add_argument("-imagenet_train_dir", type=str,
                          default='/home/jyurtsever/research/sim_train/data/imagenet_forward/train')
-    parser.add_argument("-psf_file", type=str, default= '../recon_files/psf_white_LED_Nick.tiff')
+    parser.add_argument("-psf_file", type=str, default= '../../recon_files/psf_white_LED_Nick.tiff')
     args = parser.parse_args()
 
 
