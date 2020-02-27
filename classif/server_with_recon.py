@@ -13,6 +13,8 @@ import cv2
 import json
 import struct
 import time
+import admm_model as admm_model_plain
+from utils import load_psf_image, preplot
 from torchvision import models, transforms
 from PIL import Image
 from collections import OrderedDict
@@ -46,8 +48,13 @@ def get_classes(out):
     return [(classes[idx.item()], round(percentage[idx.item()].item(),2)) for idx in indices[0][:7]]
 
 
-def get_recon(frame, iterations):
-    return frame
+def get_recon(frame):
+    perm = frame.transpose((2, 0, 1))
+    with torch.no_grad():
+        inputs = perm.to(my_device)
+        out = admm_converged2(inputs)
+
+    return preplot(out[0].cpu().detach().numpy())
 
 
 def main():
@@ -68,7 +75,8 @@ def main():
             img_data_string = pickle.dumps(recon_encode)
             conn.sendall(struct.pack(">L", len(img_data_string)) + img_data_string)
 
-            # picked_classes = get_classes(out)
+            picked_classes = get_classes(out)
+            print(picked_classes)
             #
             # data_string = pickle.dumps(picked_classes)
             #
@@ -98,6 +106,7 @@ if __name__ == '__main__':
     parser.add_argument("model_dir", type=str)
     parser.add_argument("-imagenet_train_dir", type=str,
                          default='/home/jyurtsever/research/sim_train/data/imagenet_forward/train')
+    parser.add_argument("-psf_file", type=str, default= '../recon_files/psf_white_LED_Nick.tiff')
     args = parser.parse_args()
 
 
@@ -140,8 +149,41 @@ if __name__ == '__main__':
     classes = [class_info_dict[class_wnid]["class_name"] for class_wnid in class_wnids]
 
     print("Model created")
+
+    print("Creating Recon Model")
+    my_device = 'cuda:0'
+
+    path_diffuser = 'sample_images/psf.tiff'
+    psf_diffuser = load_psf_image(path_diffuser, downsample=1, rgb=False)
+
+    ds = 4  # Amount of down-sampling.  Must be set to 4 to use dataset images
+
+    print('The shape of the loaded diffuser is:' + str(psf_diffuser.shape))
+
+    psf_diffuser = np.sum(psf_diffuser, 2)
+
+    h = skimage.transform.resize(psf_diffuser,
+                                 (psf_diffuser.shape[0] // ds, psf_diffuser.shape[1] // ds),
+                                 mode='constant', anti_aliasing=True)
+
+    var_options = {'plain_admm': [],
+                   'mu_and_tau': ['mus', 'tau'],
+                   }
+
+    learning_options_none = {'learned_vars': var_options['plain_admm']}
+
+    admm_converged2 = admm_model_plain.ADMM_Net(batch_size=1, h=h, iterations=100,
+                                                learning_options=learning_options_none, cuda_device=my_device)
+
+    admm_converged2.tau.data = admm_converged2.tau.data * 1000
+    admm_converged2.to(my_device)
+    print("Recon Model Created")
     s.listen(1)
     print('Socket now listening')
     conn, addr = s.accept()
+
+
+
+
 
     main()

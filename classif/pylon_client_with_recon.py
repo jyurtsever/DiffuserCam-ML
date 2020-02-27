@@ -36,20 +36,11 @@ def main():
                 r, image = cv2.imencode('.jpg', frame, encode_param)
                 client.send(image)
 
-                from_server = b''
-
-                payload_size = struct.calcsize(">L")
-                while len(from_server) < payload_size:
-                    data = s.recv(4096)
-                    print("yo")
-                    if not data:
-                        break
-                    from_server += data
-                print('yo1')
-                recon = cv2.imdecode(pickle.loads(from_server), 1)
+                recon = receive_img(data)
                 print('yo2')
                 show_frame(recon)
                 print('yo3')
+
                 # ### Recieve Array
                 # data = s.recv(4096)
                 # class_names = pickle.loads(data)
@@ -71,6 +62,25 @@ def main():
     camera.StopGrabbing()
 
     cv2.destroyAllWindows()
+
+def receive_img(data):
+    while len(data) < payload_size:
+        data += s.recv(4096)
+
+    print("Done Recv: {}".format(len(data)))
+    packed_msg_size = data[:payload_size]
+    data = data[payload_size:]
+    msg_size = struct.unpack(">L", packed_msg_size)[0]
+    print("msg_size: {}".format(msg_size))
+    while len(data) < msg_size:
+        data += s.recv(4096)
+    frame_data = data[:msg_size]
+    data = data[msg_size:]
+
+    frame = pickle.loads(frame_data, fix_imports=True, encoding="bytes")
+    frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+    return frame
+
 
 def show_frame(frame):
     cv2.imshow("Frame", frame)
@@ -96,4 +106,6 @@ def rescale(img, scale, width=None):
 if __name__ == '__main__':
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((HOST, ARR_PORT))
+    data = b''
+    payload_size = struct.calcsize(">L")
     main()
