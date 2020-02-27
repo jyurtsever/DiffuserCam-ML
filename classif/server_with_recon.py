@@ -14,10 +14,13 @@ import json
 import struct
 import time
 import admm_model as admm_model_plain
+import sys
+
 from utils import load_psf_image, preplot
 from torchvision import models, transforms
 from PIL import Image
 from collections import OrderedDict
+sys.path.append('models/')
 
 HOST = ''
 IMG_PORT = 8098
