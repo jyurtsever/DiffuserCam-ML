@@ -112,6 +112,7 @@ if __name__ == '__main__':
     parser.add_argument("-imagenet_train_dir", type=str,
                          default='/home/jyurtsever/research/sim_train/data/imagenet_forward/train')
     parser.add_argument("-psf_file", type=str, default= '../../recon_files/psf_white_LED_Nick.tiff')
+    parser.add_argument("-recon_iters", type=int, default=30)
     args = parser.parse_args()
 
 
@@ -176,7 +177,7 @@ if __name__ == '__main__':
 
     learning_options_none = {'learned_vars': var_options['plain_admm']}
 
-    admm_converged2 = admm_model_plain.ADMM_Net(batch_size=1, h=h, iterations=10,
+    admm_converged2 = admm_model_plain.ADMM_Net(batch_size=1, h=h, iterations=args.recon_iters,
                                                 learning_options=learning_options_none, cuda_device=my_device)
 
     admm_converged2.tau.data = admm_converged2.tau.data * 1000

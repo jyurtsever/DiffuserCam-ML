@@ -33,7 +33,7 @@ def main():
                 image = converter.Convert(grabResult)
                 frame = image.GetArray()
                 frame = rescale(frame, .45, width=480)
-                r, image = cv2.imencode('.jpg', frame, encode_param)
+                r, image = cv2.imencode('.tiff', frame)#, encode_param)
                 client.send(image)
 
                 recon = receive_img(data)
