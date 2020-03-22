@@ -52,13 +52,12 @@ def get_classes(out):
 
 
 def get_recon(frame):
-    frame_float = (frame/np.max(frame)).astype('float32') 
+    frame_float =  frame.astype('float32') #(frame/np.max(frame)).astype('float32') 
     perm = torch.tensor(frame_float.transpose((2, 0, 1))).unsqueeze(0)
     with torch.no_grad():
         inputs = perm.to(my_device)
-        out = admm_converged2(inputs)
-
-    return preplot(out[0].cpu().detach().numpy())
+        out = admm_converged2(inputs)[0].cpu().detach()
+    return np.flipud((preplot(out.numpy())*255).astype('uint8'))[...,::-1]
 
 
 def main():
@@ -69,11 +68,13 @@ def main():
     while True:
         try:
             message = server.receive()
-            frame = cv2.imdecode(message.image,1)
-
-            out = net_forward(frame)
+            frame = cv2.imdecode(message.image,cv2.IMREAD_COLOR)
+            print(np.mean(frame), np.max(frame), np.min(frame))
+            frame = frame.astype(np.float32)/255
+            #out = net_forward(frame)
             recon = get_recon(frame)
-            recon = (recon*255).astype('uint8')
+            print(np.mean(recon), np.max(recon), np.min(recon)) 
+            out = net_forward(recon)
             r, recon_encode = cv2.imencode('.jpg', recon, encode_param)
 
             ###Send
@@ -112,7 +113,7 @@ if __name__ == '__main__':
     parser.add_argument("-imagenet_train_dir", type=str,
                          default='/home/jyurtsever/research/sim_train/data/imagenet_forward/train')
     parser.add_argument("-psf_file", type=str, default= '../../recon_files/psf_white_LED_Nick.tiff')
-    parser.add_argument("-recon_iters", type=int, default=30)
+    parser.add_argument("-recon_iters", type=int, default=10)
     args = parser.parse_args()
 
 
