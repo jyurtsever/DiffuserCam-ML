@@ -52,7 +52,9 @@ def get_classes(out):
 
 
 def get_recon(frame):
-    frame_float =  frame[:, :, :].astype('float32') #(frame/np.max(frame)).astype('float32') 
+
+    frame_norm = frame.astype(np.float32)/255
+    frame_float = frame_norm.astype('float32') #(frame/np.max(frame)).astype('float32') 
     perm = torch.tensor(frame_float.transpose((2, 0, 1))).unsqueeze(0)
     with torch.no_grad():
         inputs = perm.to(my_device)
@@ -68,8 +70,7 @@ def main():
     while True:
         try:
             message = server.receive()
-            frame = cv2.imdecode(message.image,cv2.IMREAD_COLOR)
-            frame = frame.astype(np.float32)/255
+            frame = cv2.imdecode(message.image)#cv2.IMREAD_COLOR)
             recon = get_recon(frame)
             print(frame)
             if args.use_recon:
