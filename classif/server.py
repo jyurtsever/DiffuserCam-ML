@@ -83,7 +83,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("model_dir", type=str)
     parser.add_argument("-imagenet_train_dir", type=str,
-                         default='/home/jyurtsever/research/sim_train/data/imagenet_forward/train')
+                         default='/home/jyurtsever/research/sim_train/data/imagenet_forward_2/train')
     args = parser.parse_args()
 
 

@@ -52,7 +52,7 @@ def get_classes(out):
 
 
 def get_recon(frame):
-    frame_float =  frame.astype('float32') #(frame/np.max(frame)).astype('float32') 
+    frame_float =  frame[:, :, :].astype('float32') #(frame/np.max(frame)).astype('float32') 
     perm = torch.tensor(frame_float.transpose((2, 0, 1))).unsqueeze(0)
     with torch.no_grad():
         inputs = perm.to(my_device)
@@ -69,12 +69,13 @@ def main():
         try:
             message = server.receive()
             frame = cv2.imdecode(message.image,cv2.IMREAD_COLOR)
-            print(np.mean(frame), np.max(frame), np.min(frame))
             frame = frame.astype(np.float32)/255
-            #out = net_forward(frame)
             recon = get_recon(frame)
-            print(np.mean(recon), np.max(recon), np.min(recon)) 
-            out = net_forward(recon)
+            print(frame)
+            if args.use_recon:
+                out = net_forward(recon)
+            else:
+                out = net_forward(frame) 
             r, recon_encode = cv2.imencode('.jpg', recon, encode_param)
 
             ###Send
@@ -83,11 +84,6 @@ def main():
 
             picked_classes = get_classes(out)
             print(picked_classes)
-            #
-            # data_string = pickle.dumps(picked_classes)
-            #
-            # ###Send
-            # conn.send(data_string)
 
             cv2.waitKey(1)
         except KeyboardInterrupt:
@@ -111,9 +107,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("model_dir", type=str)
     parser.add_argument("-imagenet_train_dir", type=str,
-                         default='/home/jyurtsever/research/sim_train/data/imagenet_forward/train')
+                         default='/home/jyurtsever/research/sim_train/data/imagenet_forward_2/train')
     parser.add_argument("-psf_file", type=str, default= '../../recon_files/psf_white_LED_Nick.tiff')
     parser.add_argument("-recon_iters", type=int, default=10)
+    parser.add_argument("-use_recon", type=int, default=0)
     args = parser.parse_args()
 
 
