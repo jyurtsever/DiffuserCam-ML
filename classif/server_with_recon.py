@@ -59,7 +59,7 @@ def get_recon(frame):
     with torch.no_grad():
         inputs = perm.to(my_device)
         out = admm_converged2(inputs)[0].cpu().detach()
-    return np.flipud((preplot(out.numpy())*255).astype('uint8'))[...,::-1]
+    return np.flipud((preplot(out.numpy())*255).astype('uint8')) #[...,::-1]
 
 
 def main():
@@ -70,13 +70,14 @@ def main():
     while True:
         try:
             message = server.receive()
-            frame = cv2.imdecode(message.image)#cv2.IMREAD_COLOR)
+            frame = cv2.cvtColor(cv2.imdecode(message.image, 1), cv2.COLOR_BGR2RGB)#cv2.IMREAD_COLOR)#[:, :, ::-1]
             recon = get_recon(frame)
-            print(frame)
+            #print(frame)
             if args.use_recon:
                 out = net_forward(recon)
             else:
                 out = net_forward(frame) 
+            #print(recon) 
             r, recon_encode = cv2.imencode('.jpg', recon, encode_param)
 
             ###Send
