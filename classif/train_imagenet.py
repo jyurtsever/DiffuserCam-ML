@@ -17,6 +17,16 @@ import torch.utils.data.distributed
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
+import sys
+import skimage
+
+sys.path.append('./models/')
+import admm_model as admm_model_plain
+from utils import load_psf_image, preplot
+
+
+
+
 from multiprocessing import set_start_method
 
 try:
@@ -38,6 +48,10 @@ parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
                         ' | '.join(model_names) +
                         ' (default: resnet18)')
 parser.add_argument('-save_path', type=str, help='path to save checkpoint')
+
+parser.add_argument('-use_le_admm', dest='use_le_admm', action='store_true',
+                    help='use learned admm and train with it')
+
 parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
 parser.add_argument('--epochs', default=90, type=int, metavar='N',
@@ -120,6 +134,42 @@ def main():
         main_worker(args.gpu, ngpus_per_node, args)
 
 
+def make_admm_model(args):
+    print("Creating Recon Model")
+    my_device = 'cuda:0'
+
+    psf_diffuser = load_psf_image(args.psf_file, downsample=1, rgb=False)
+
+    ds = 4  # Amount of down-sampling.  Must be set to 4 to use dataset images
+
+    print('The shape of the loaded diffuser is:' + str(psf_diffuser.shape))
+
+    psf_diffuser = np.sum(psf_diffuser, 2)
+
+    h = skimage.transform.resize(psf_diffuser,
+                                 (psf_diffuser.shape[0] // ds, psf_diffuser.shape[1] // ds),
+                                 mode='constant', anti_aliasing=True)
+
+    var_options = {'plain_admm': [],
+                   'mu_and_tau': ['mus', 'tau'],
+                   }
+    learning_options = {'learned_vars': var_options['mu_and_tau']}
+
+
+    model = admm_model_plain.ADMM_Net(batch_size=1, h=h, iterations=5,
+                                      learning_options=learning_options, cuda_device=my_device)
+
+    le_admm = torch.load('saved_models/model_le_admm.pt', map_location=my_device)
+    le_admm.cuda_device = my_device
+    for pn, pd in le_admm.named_parameters():
+        for pnn, pdd in model.named_parameters():
+            if pnn == pn:
+                pdd.data = pd.data
+
+    model.tau.data = model.tau.data * 1000
+    model.to(my_device)
+
+
 def main_worker(gpu, ngpus_per_node, args):
     global best_acc1
     args.gpu = gpu
@@ -137,12 +187,18 @@ def main_worker(gpu, ngpus_per_node, args):
         dist.init_process_group(backend=args.dist_backend, init_method=args.dist_url,
                                 world_size=args.world_size, rank=args.rank)
     # create model
-    if args.pretrained:
+    if args.use_le_admm:
+        admm_model = make_admm_model(args)
+
+    elif args.pretrained:
         print("=> using pre-trained model '{}'".format(args.arch))
         model = models.__dict__[args.arch](pretrained=True)
     else:
         print("=> creating model '{}'".format(args.arch))
         model = models.__dict__[args.arch]()
+
+    if args.use_le_admm:
+        model = torch.cat(admm_model, model)
 
     if args.distributed:
         # For multiprocessing distributed, DistributedDataParallel constructor
@@ -427,6 +483,9 @@ def accuracy(output, target, topk=(1,)):
             correct_k = correct[:k].view(-1).float().sum(0, keepdim=True)
             res.append(correct_k.mul_(100.0 / batch_size))
         return res
+
+
+
 
 
 if __name__ == '__main__':
