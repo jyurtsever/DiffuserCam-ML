@@ -25,14 +25,7 @@ from collections import OrderedDict
 HOST = ''
 IMG_PORT = 8098
 ARR_PORT = 8097
-# ARR_PORT_2 = 8099
-# body_parts = ['Nose', 'Neck', 'Right Shoulder', 'Right Elbow', 'Right Wrist',
-#               'Left Shoulder', 'Left Elbow', 'Left Wrist', 'Right Hip', 'Right Knee', 'Right Ankle',
-#               'Left Hip', 'Left Knee', 'LAnkle', 'Right Eye', 'Left Eye', 'Right Ear', 'Left Ear', 'Background']
 
-
-# def initialize(frame, flip=False):
-#     return trans(frame)
 
 def net_forward(frame):
     image = Image.fromarray(frame)
@@ -40,9 +33,8 @@ def net_forward(frame):
     if use_gpu:
         image = image.cuda()
 
-    #print(image.shape)
-    out = net(image).cpu() #.detach().numpy()
-    return out #[0]
+    out = net(image).cpu()
+    return out
 
 
 def get_classes(out):
@@ -58,7 +50,7 @@ def get_recon(frame):
     perm = torch.tensor(frame_float.transpose((2, 0, 1))).unsqueeze(0)
     with torch.no_grad():
         inputs = perm.to(my_device)
-        out = admm_converged2(inputs)[0].cpu().detach()
+        out = model(inputs)[0].cpu().detach()
     return np.flipud((preplot(out.numpy())*255).astype('uint8'))[...,::-1]
 
 
@@ -113,6 +105,7 @@ if __name__ == '__main__':
     parser.add_argument("-psf_file", type=str, default= '../../recon_files/psf_white_LED_Nick.tiff')
     parser.add_argument("-recon_iters", type=int, default=10)
     parser.add_argument("-use_recon", type=int, default=0)
+    parser.add_argument("-use_le_admm", type=int, default=0)
     args = parser.parse_args()
 
 
@@ -167,6 +160,7 @@ if __name__ == '__main__':
 
     psf_diffuser = np.sum(psf_diffuser, 2)
 
+
     h = skimage.transform.resize(psf_diffuser,
                                  (psf_diffuser.shape[0] // ds, psf_diffuser.shape[1] // ds),
                                  mode='constant', anti_aliasing=True)
@@ -174,14 +168,25 @@ if __name__ == '__main__':
     var_options = {'plain_admm': [],
                    'mu_and_tau': ['mus', 'tau'],
                    }
+    if args.use_le_admm:
+        learning_options = {'learned_vars': var_options['mu_and_tau']}
 
-    learning_options_none = {'learned_vars': var_options['plain_admm']}
+    else:
+        learning_options = {'learned_vars': var_options['plain_admm']}
 
-    admm_converged2 = admm_model_plain.ADMM_Net(batch_size=1, h=h, iterations=args.recon_iters,
-                                                learning_options=learning_options_none, cuda_device=my_device)
+    model = admm_model_plain.ADMM_Net(batch_size=1, h=h, iterations=args.recon_iters,
+                                                learning_options=learning_options, cuda_device=my_device)
 
-    admm_converged2.tau.data = admm_converged2.tau.data * 1000
-    admm_converged2.to(my_device)
+    if args.use_le_admm:
+        le_admm = torch.load('saved_models/model_le_admm.pt', map_location=my_device)
+        le_admm.cuda_device = my_device
+        for pn, pd in le_admm.named_parameters():
+            for pnn, pdd in model.named_parameters():
+                if pnn == pn:
+                    pdd.data = pd.data
+
+    model.tau.data = model.tau.data * 1000
+    model.to(my_device)
     print("Recon Model Created")
     s.listen(1)
     print('Socket now listening')
