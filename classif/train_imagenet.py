@@ -19,7 +19,7 @@ import torchvision.datasets as datasets
 import torchvision.models as models
 import sys
 import skimage
-
+import numpy as np
 sys.path.append('./models/')
 import admm_model as admm_model_plain
 from utils import load_psf_image, preplot
@@ -48,6 +48,8 @@ parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
                         ' | '.join(model_names) +
                         ' (default: resnet18)')
 parser.add_argument('-save_path', type=str, help='path to save checkpoint')
+
+parser.add_argument("-psf_file", type=str, default= '../../recon_files/psf_white_LED_Nick.tiff')
 
 parser.add_argument('-use_le_admm', dest='use_le_admm', action='store_true',
                     help='use learned admm and train with it')
@@ -159,7 +161,7 @@ def make_admm_model(args):
     model = admm_model_plain.ADMM_Net(batch_size=1, h=h, iterations=5,
                                       learning_options=learning_options, cuda_device=my_device)
 
-    le_admm = torch.load('saved_models/model_le_admm.pt', map_location=my_device)
+    le_admm = torch.load('../../saved_models/model_le_admm.pt', map_location=my_device)
     le_admm.cuda_device = my_device
     for pn, pd in le_admm.named_parameters():
         for pnn, pdd in model.named_parameters():
@@ -168,7 +170,7 @@ def make_admm_model(args):
 
     model.tau.data = model.tau.data * 1000
     model.to(my_device)
-
+    return model
 
 def main_worker(gpu, ngpus_per_node, args):
     global best_acc1
@@ -190,7 +192,7 @@ def main_worker(gpu, ngpus_per_node, args):
     if args.use_le_admm:
         admm_model = make_admm_model(args)
 
-    elif args.pretrained:
+    if args.pretrained:
         print("=> using pre-trained model '{}'".format(args.arch))
         model = models.__dict__[args.arch](pretrained=True)
     else:
@@ -198,7 +200,7 @@ def main_worker(gpu, ngpus_per_node, args):
         model = models.__dict__[args.arch]()
 
     if args.use_le_admm:
-        model = torch.cat(admm_model, model)
+        model = nn.Sequential(admm_model, model)
 
     if args.distributed:
         # For multiprocessing distributed, DistributedDataParallel constructor

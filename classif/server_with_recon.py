@@ -178,7 +178,7 @@ if __name__ == '__main__':
                                                 learning_options=learning_options, cuda_device=my_device)
 
     if args.use_le_admm:
-        le_admm = torch.load('saved_models/model_le_admm.pt', map_location=my_device)
+        le_admm = torch.load('../../saved_models/model_le_admm.pt', map_location=my_device)
         le_admm.cuda_device = my_device
         for pn, pd in le_admm.named_parameters():
             for pnn, pdd in model.named_parameters():
