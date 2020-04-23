@@ -95,7 +95,6 @@ class ADMM_Net(nn.Module):
         
         if self.autotune==True:
             self.mu_auto_list = {'mu1': [], 'mu2': [], 'mu3': []}
-
         # If using simulated data, input the raw image and run through forward model
         if self.realdata == False: 
             y = crop(self, self.Hfor(pad_dim2(self, inputs)))

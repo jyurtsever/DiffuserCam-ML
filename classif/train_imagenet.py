@@ -29,6 +29,7 @@ from utils import load_psf_image, preplot
 
 from multiprocessing import set_start_method
 
+
 try:
     set_start_method('spawn')
 except RuntimeError:
@@ -53,6 +54,9 @@ parser.add_argument("-psf_file", type=str, default= '../../recon_files/psf_white
 
 parser.add_argument('-use_le_admm', dest='use_le_admm', action='store_true',
                     help='use learned admm and train with it')
+
+parser.add_argument('-train_admm', dest='train_admm', action='store_true',
+                        help='train admm hyper parameters')
 
 parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
@@ -155,7 +159,11 @@ def make_admm_model(args):
     var_options = {'plain_admm': [],
                    'mu_and_tau': ['mus', 'tau'],
                    }
-    learning_options = {'learned_vars': var_options['mu_and_tau']}
+
+    if args.train_admm:
+        learning_options = {'learned_vars': var_options['mu_and_tau']}
+    else:
+        learning_options = {'learned_vars': var_options['plain_admm']}
 
 
     model = admm_model_plain.ADMM_Net(batch_size=1, h=h, iterations=5,
@@ -517,8 +525,7 @@ class Ensemble(nn.Module):
             normalize])
 
     def forward(self, x):
-        out = self.denoiser(x.transpose((2, 0, 1)))
-        out = self.trans(out)
+        out = self.denoiser(x)
         out = self.classifier(out)
         return out
 
