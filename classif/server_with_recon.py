@@ -27,13 +27,35 @@ IMG_PORT = 8098
 ARR_PORT = 8097
 
 
+
+
+class Ensemble(nn.Module):
+    def __init__(self, denoiser, classifier):
+        super(Ensemble, self).__init__()
+        self.denoiser = denoiser
+        self.classifier = classifier
+
+    def forward(self, x):
+        out = self.denoiser(x)
+        out = self.classifier(out)
+        return out
+
+    def to(self, indevice):
+        super().to(indevice)
+        self.denoiser.to(indevice)
+        self.denoiser.h_var.to(indevice)
+        self.denoiser.h_zeros.to(indevice)
+        self.denoiser.h_complex.to(indevice)
+        self.denoiser.LtL.to(indevice)
+        return self
+
 def net_forward(frame):
     image = Image.fromarray(frame)
     image = trans(image).view(1, 3, 224, 224)
     if use_gpu:
         image = image.cuda()
 
-    out = net(image).cpu()
+    out = classifier(image).cpu()
     return out
 
 
@@ -42,6 +64,17 @@ def get_classes(out):
     percentage = torch.nn.functional.softmax(out, dim=1)[0]
     return [(classes[idx.item()], round(percentage[idx.item()].item(),2)) for idx in indices[0][:7]]
 
+def ensemble_forward(frame):
+    image = Image.fromarray(frame)
+    image = image.view(1, 3, 224, 224)
+    if use_gpu:
+        image = image.cuda()
+
+    out, recon = model(frame)
+    recon = recon[0].cpu().detach()
+    recon = np.flipud((preplot(recon.numpy())*255).astype('uint8'))[...,::-1]
+    out = out.cpu()
+    return out, recon
 
 def get_recon(frame):
 
@@ -63,12 +96,20 @@ def main():
         try:
             message = server.receive()
             frame = cv2.cvtColor(cv2.imdecode(message.image, 1), cv2.IMREAD_COLOR)#[:, :, ::-1]
-            recon = get_recon(frame)
-            #print(frame)
+            if not args.use_ensemble:
+                recon = get_recon(frame)
+
+            #reconstruct before running classifier
             if args.use_recon:
                 out = net_forward(recon)
+
+            #use ensemble model
+            elif args.use_ensemble:
+                out, recon = ensemble_forward(frame)
+
+            #use raw diffuser
             else:
-                out = net_forward(frame) 
+                out = net_forward(frame)
             #print(recon) 
             r, recon_encode = cv2.imencode('.jpg', recon, encode_param)
 
@@ -106,6 +147,7 @@ if __name__ == '__main__':
     parser.add_argument("-recon_iters", type=int, default=10)
     parser.add_argument("-use_recon", type=int, default=0)
     parser.add_argument("-use_le_admm", type=int, default=0)
+    parser.add_argument('-use_ensemble', dest='use_ensemble', action='store_true')
     args = parser.parse_args()
 
 
@@ -119,15 +161,16 @@ if __name__ == '__main__':
 
     # Read the network from Memory
     print("Initializing Model")
-    net = models.resnet18(num_classes=1000)
+    classifier = models.resnet18(num_classes=1000)
     checkpoint = torch.load(args.model_dir)
     #print(checkpoint.keys())
-    net.load_state_dict(fix_state_dict(checkpoint['state_dict']))
+    if not args.use_ensemble:
+        classifier.load_state_dict(fix_state_dict(checkpoint['state_dict']))
 
     use_gpu = torch.cuda.is_available()
     if use_gpu:
-        net = net.cuda()
-    net.eval()
+        classifier = classifier.cuda()
+    classifier.eval()
 
     trans = transforms.Compose([
         transforms.Scale(224),
@@ -187,6 +230,11 @@ if __name__ == '__main__':
 
     model.tau.data = model.tau.data * 1000
     model.to(my_device)
+
+    if args.use_ensemble:
+        model = Ensemble(model, classifier)
+        model.load_state_dict(fix_state_dict(checkpoint['state_dict']))
+
     print("Recon Model Created")
     s.listen(1)
     print('Socket now listening')
