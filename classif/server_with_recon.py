@@ -110,7 +110,7 @@ def main():
             #use raw diffuser
             else:
                 out = net_forward(frame)
-            #print(recon) 
+            #print(recon)
             r, recon_encode = cv2.imencode('.jpg', recon, encode_param)
 
             ###Send
@@ -145,8 +145,8 @@ if __name__ == '__main__':
                          default='/home/jyurtsever/research/sim_train/data/imagenet_forward_2/train')
     parser.add_argument("-psf_file", type=str, default= '../../recon_files/psf_white_LED_Nick.tiff')
     parser.add_argument("-recon_iters", type=int, default=10)
-    parser.add_argument("-use_recon", type=int, default=0)
-    parser.add_argument("-use_le_admm", type=int, default=0)
+    parser.add_argument("-use_recon", dest='use_recon', action='store_true')
+    parser.add_argument("-use_le_admm", dest='use_le_admm', action='store_true')
     parser.add_argument('-use_ensemble', dest='use_ensemble', action='store_true')
     args = parser.parse_args()
 
