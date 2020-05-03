@@ -229,8 +229,12 @@ def main_worker(gpu, ngpus_per_node, args):
             # available GPUs if device_ids are not set
             model = torch.nn.parallel.DistributedDataParallel(model)
     elif args.gpu is not None:
-        torch.cuda.set_device(args.gpu)
-        model = model.cuda(args.gpu)
+        if args.use_le_admm:
+            print("using ensemble.to()")
+            model = model.to(args.gpu)
+        else: 
+            torch.cuda.set_device(args.gpu)
+            model = model.cuda(args.gpu)
     else:
         # DataParallel will divide and allocate batch_size to all available GPUs
         if args.arch.startswith('alexnet') or args.arch.startswith('vgg'):
@@ -387,6 +391,13 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
         # compute gradient and do SGD step
         optimizer.zero_grad()
         loss.backward()
+
+        # remove nan gradients
+        for name, p in model.named_parameters():
+            if p.grad is not None:
+                p.grad[p.grad != p.grad] = 0.
+
+        # SGD step
         optimizer.step()
 
         # measure elapsed time
@@ -529,7 +540,14 @@ class Ensemble(nn.Module):
         out = self.classifier(out)
         return out
 
-
+    def to(self, indevice):
+        super().to(indevice)
+        self.denoiser.to(indevice)
+        self.denoiser.h_var.to(indevice)
+        self.denoiser.h_zeros.to(indevice)
+        self.denoiser.h_complex.to(indevice)
+        self.denoiser.LtL.to(indevice)
+        return self
 
 if __name__ == '__main__':
     main()
