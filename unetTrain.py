@@ -186,15 +186,6 @@ if __name__ == '__main__':
         default=4,  # default if nothing is provided
     )
 
-    # CLI.add_argument(
-    #     "--save_test_results",  # name on the CLI - drop the `--` for positional/required parameters
-    #     type=str,
-    # )
-
-    # CLI.add_argument(
-    #     "--filename",  # name on the CLI - drop the `--` for positional/required parameters
-    #     type=str,
-    # )
     CLI.add_argument(
         "--loss_fn",  # name on the CLI - drop the `--` for positional/required parameters
         type=str,
@@ -236,6 +227,12 @@ if __name__ == '__main__':
     )
 
     CLI.add_argument(
+        "--dir_name",
+        type=str,
+        default=None
+    )
+
+    CLI.add_argument(
         "--weight_decay",
         type=float,
         default=0.0
@@ -245,6 +242,8 @@ if __name__ == '__main__':
     args = CLI.parse_args()
     if args.dset_size:
         dir_name = 'net_' + args.net + '_ADMM_' + args.n_iters + '_dset_size_' + args.dset_size + '_loss_' + args.loss_fn
+    elif args.dir_name:
+       dir_name = args.dir_name
     else:
         dir_name = 'net_' + args.net + '_ADMM_' + args.n_iters + '_dset_size_' + 'all' + '_loss_' + args.loss_fn
     save_path = args.save_path + dir_name + '/'
