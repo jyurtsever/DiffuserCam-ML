@@ -36,9 +36,9 @@ class Ensemble(nn.Module):
         self.classifier = classifier
 
     def forward(self, x):
-        out = self.denoiser(x)
-        out = self.classifier(out)
-        return out
+        recon  = self.denoiser(x)
+        out = self.classifier(recon)
+        return out, recon
 
     def to(self, indevice):
         super().to(indevice)
@@ -65,16 +65,22 @@ def get_classes(out):
     return [(classes[idx.item()], round(percentage[idx.item()].item(),2)) for idx in indices[0][:7]]
 
 def ensemble_forward(frame):
-    image = Image.fromarray(frame)
-    image = image.view(1, 3, 224, 224)
+    input_ = get_admm_input(frame)
     if use_gpu:
-        image = image.cuda()
+        input_ = input_.cuda()
 
-    out, recon = model(frame)
+    out, recon = model(input_)
     recon = recon[0].cpu().detach()
     recon = np.flipud((preplot(recon.numpy())*255).astype('uint8'))[...,::-1]
     out = out.cpu()
     return out, recon
+
+
+def get_admm_input(frame):
+    frame_norm = frame.astype(np.float32)/255
+    frame_float = frame_norm.astype('float32') #(frame/np.max(frame)).astype('float32') 
+    perm = torch.tensor(frame_float.transpose((2, 0, 1))).unsqueeze(0)
+    return perm
 
 def get_recon(frame):
 
@@ -220,7 +226,7 @@ if __name__ == '__main__':
     model = admm_model_plain.ADMM_Net(batch_size=1, h=h, iterations=args.recon_iters,
                                                 learning_options=learning_options, cuda_device=my_device)
 
-    if args.use_le_admm:
+    if args.use_le_admm or args.use_ensemble:
         le_admm = torch.load('../../saved_models/model_le_admm.pt', map_location=my_device)
         le_admm.cuda_device = my_device
         for pn, pd in le_admm.named_parameters():
