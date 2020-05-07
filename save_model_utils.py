@@ -23,13 +23,13 @@ def save_model_summary(model, test_loader, args):
    loss_dict['time_gpu'] = time_gpu
    #loss_dict['time_cpu'] = time_cpu
 
-   loss_dict['filename'] = 'net_' + args.net + '_ADMM_' + args.n_iters + '_dset_size_'\
+   loss_dict['filename'] = args.dir_name + '.mat' if args.dir_name else 'net_' + args.net + '_ADMM_' + args.n_iters + '_dset_size_'\
                                       + args.dset_size + '_loss_' + args.loss_fn
-   loss_dict['description'] = 'ADMM, muand tau,' + args.n_iters + ' iterations, tau init 0.0002 ' + \
+   loss_dict['description'] = args.dir_name + '.mat'  if args.dir_name else 'ADMM, muand tau,' + args.n_iters + ' iterations, tau init 0.0002 ' + \
                                str(args.num_epochs) + ' epochs, ' + ' dataset ' + args.dset_size + \
                               ' loss ' + args.loss_fn
 
-   save_filename = (args.save_path + '/saved_stats/'+loss_dict['filename'])
+   save_filename = (args.save_path + '/saved_stats/'+ loss_dict['filename'])
 
    print('\r', 'Saving as:', save_filename, end = '')
    scipy.io.savemat(save_filename, loss_dict)

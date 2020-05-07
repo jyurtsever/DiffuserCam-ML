@@ -15,6 +15,7 @@ import torch.multiprocessing as mp
 import torch.utils.data
 import torch.utils.data.distributed
 import torchvision.transforms as transforms
+import torchvision.transforms.functional as TF
 import torchvision.datasets as datasets
 import torchvision.models as models
 import sys
@@ -57,6 +58,8 @@ parser.add_argument('-use_le_admm', dest='use_le_admm', action='store_true',
 
 parser.add_argument('-train_admm', dest='train_admm', action='store_true',
                         help='train admm hyper parameters')
+parser.add_argument('-flip_diffuser_im', dest='flip_diffuser_im', action='store_true',
+                        help='flip diffusercam img while training')
 
 parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
@@ -282,20 +285,34 @@ def main_worker(gpu, ngpus_per_node, args):
                                      std=[0.229, 0.224, 0.225])
 
     if args.use_le_admm:
+        if args.flip_diffuser_im:
+            print("flipping diffuser images")
+            trans = transforms.Compose([FlipUDTrans(), transforms.ToTensor()])
+        else:
+            trans = transforms.Compose([transforms.ToTensor()])
+
         train_dataset = datasets.ImageFolder(
             traindir,
-            transforms.Compose([
-                transforms.ToTensor(),
-            ]))
+            trans)
     else:
+        if args.flip_diffuser_im:  
+            print("WARNING: random flip and random crop on diffuser im could result in errors in wrong training")
+            trans = transforms.Compose([FlipUDTrans(),
+                        transforms.RandomResizedCrop(224),
+                        transforms.RandomHorizontalFlip(),
+                        transforms.ToTensor(),
+                        normalize,
+                    ])
+        else:
+            trans = transforms.Compose([
+                        transforms.RandomResizedCrop(224),
+                        transforms.RandomHorizontalFlip(),
+                        transforms.ToTensor(),
+                        normalize,
+                    ])
         train_dataset = datasets.ImageFolder(
             traindir,
-            transforms.Compose([
-                transforms.RandomResizedCrop(224),
-                transforms.RandomHorizontalFlip(),
-                transforms.ToTensor(),
-                normalize,
-            ]))
+            trans)
 
 
     if args.distributed:
@@ -309,9 +326,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     if args.use_le_admm:
         val_loader = torch.utils.data.DataLoader(
-            datasets.ImageFolder(valdir, transforms.Compose([
-                transforms.ToTensor(),
-            ])),
+            datasets.ImageFolder(valdir, trans),
             batch_size=args.batch_size, shuffle=False,
             num_workers=args.workers, pin_memory=True)
     else:
@@ -548,6 +563,15 @@ class Ensemble(nn.Module):
         self.denoiser.h_complex.to(indevice)
         self.denoiser.LtL.to(indevice)
         return self
+
+class FlipUDTrans:
+    def __init__(self):
+        pass
+    
+    def __call__(self, img):
+        return TF.vflip(img)
+
+
 
 if __name__ == '__main__':
     main()

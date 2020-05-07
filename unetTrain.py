@@ -17,6 +17,7 @@ import matplotlib.image as img
 import cv2
 import sys
 import argparse
+import imageio
 from reconNet import *
 from save_model_utils import *
 from sklearn.model_selection import train_test_split
@@ -89,11 +90,12 @@ def evaluate(model, loss_fn, test_loader):
                             out_name = save_path + '/out/' + im_name
                             # gt_name = save_path + '/gt/' + im_name
                             recon_name = save_path + '/recon/' + im_name
-                            scm.imsave(out_name, curr_out)
+                            imageio.imwrite(out_name, curr_out)
                             # scm.imsave(gt_name, curr_gt)
-                            scm.imsave(recon_name, curr_recon)
+                            imageio.imwrite(recon_name, curr_recon)
                             i += 1
         except AttributeError as e:
+            print(e)
             print("stopped at batch_idx: ", batch_idx)
     print("Running Kristinas's code")
     save_model_summary(model, test_loader, args)
@@ -101,6 +103,7 @@ def evaluate(model, loss_fn, test_loader):
         # io.savemat('test.mat', save_dict)
 
 def run_train(model, optimizer, loss_fn, train_loader, num_epochs):
+    epoch = 0
     for epoch in range(num_epochs):
         train(model, optimizer, loss_fn, train_loader, epoch)
     torch.save({
@@ -147,6 +150,9 @@ def unet_optimize(args):
         raise IOError('ERROR: Unrecognized net')
     if use_gpu:
         model = model.cuda()
+
+    if args.resume:
+        model.load_state_dict(torch.load(args.resume)['model_state_dict'])
 
     if args.loss_fn == 'lpips':
         loss_fn = ps.PerceptualLoss().forward #nn.MSELoss()
@@ -214,6 +220,13 @@ if __name__ == '__main__':
         type=str,
         default='UNet512'
     )
+
+    CLI.add_argument(
+        "--resume",
+        type=str,
+        default=None
+    )
+
     CLI.add_argument(
         "--save_path",
         type=str,
@@ -240,14 +253,18 @@ if __name__ == '__main__':
 
 
     args = CLI.parse_args()
-    if args.dset_size:
-        dir_name = 'net_' + args.net + '_ADMM_' + args.n_iters + '_dset_size_' + args.dset_size + '_loss_' + args.loss_fn
-    elif args.dir_name:
+    if args.dir_name:
        dir_name = args.dir_name
+
+    elif args.dset_size:
+        dir_name = 'net_' + args.net + '_ADMM_' + args.n_iters + '_dset_size_' + args.dset_size + '_loss_' + args.loss_fn
+    
     else:
         dir_name = 'net_' + args.net + '_ADMM_' + args.n_iters + '_dset_size_' + 'all' + '_loss_' + args.loss_fn
     save_path = args.save_path + dir_name + '/'
-    os.mkdir(save_path); os.mkdir(save_path + 'gt/'); os.mkdir(save_path + 'out/'); os.mkdir(save_path + 'recon/')
+
+    if not args.resume:
+        os.mkdir(save_path); os.mkdir(save_path + 'gt/'); os.mkdir(save_path + 'out/'); os.mkdir(save_path + 'recon/')
     if args.save_path == '../saved_models/':
         if args.dset_size != 'short':
             csv_path_test = '../saved_models/dataset_12_12_test.csv'
