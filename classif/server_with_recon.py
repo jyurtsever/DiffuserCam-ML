@@ -51,7 +51,7 @@ class Ensemble(nn.Module):
 
 def net_forward(frame):
     image = Image.fromarray(frame)
-    image = trans(image).view(1, 3, 224, 224)
+    image = trans(image).unsqueeze(0)
     if use_gpu:
         image = image.cuda()
 
@@ -90,7 +90,7 @@ def get_recon(frame):
     with torch.no_grad():
         inputs = perm.to(my_device)
         out = model(inputs)[0].cpu().detach()
-    return np.flipud((preplot(out.numpy())*255).astype('uint8'))[...,::-1]
+    return ((preplot(out.numpy())*255).astype('uint8'))[...,::-1]
 
 
 def main():
@@ -154,6 +154,7 @@ if __name__ == '__main__':
     parser.add_argument("-use_recon", dest='use_recon', action='store_true')
     parser.add_argument("-use_le_admm", dest='use_le_admm', action='store_true')
     parser.add_argument('-use_ensemble', dest='use_ensemble', action='store_true')
+    parser.add_argument('-load_le_admm', dest='load_le_admm', action='store_true')
     args = parser.parse_args()
 
 
@@ -177,14 +178,19 @@ if __name__ == '__main__':
     if use_gpu:
         classifier = classifier.cuda()
     classifier.eval()
-
-    trans = transforms.Compose([
-        transforms.Scale(224),
-        transforms.CenterCrop(224),
-        transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-        # from http://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html
-    ])
+    
+    if args.use_recon:
+        trans = transforms.Compose([
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            # from http://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html
+        ])
+    else:
+        print("using only square crop transformation")
+        trans = transforms.Compose([transforms.Resize((224, 224)), transforms.ToTensor(),     
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
 
     # $url = 'https://gist.githubusercontent.com/yrevar/942d3a0ac09ec9e5eb3a/' \
     #       'raw/596b27d23537e5a1b5751d2b0481ef172f58b539/imagenet1000_clsid_to_human.txt'
@@ -226,7 +232,7 @@ if __name__ == '__main__':
     model = admm_model_plain.ADMM_Net(batch_size=1, h=h, iterations=args.recon_iters,
                                                 learning_options=learning_options, cuda_device=my_device)
 
-    if args.use_le_admm or args.use_ensemble:
+    if args.use_le_admm or args.use_ensemble or args.load_le_admm:
         le_admm = torch.load('../../saved_models/model_le_admm.pt', map_location=my_device)
         le_admm.cuda_device = my_device
         for pn, pd in le_admm.named_parameters():

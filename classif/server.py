@@ -29,6 +29,7 @@ ARR_PORT = 8097
 #     return trans(frame)
 
 def net_forward(frame):
+    print(frame.dtype)
     image = Image.fromarray(frame)
     image = trans(image).view(1, 3, 224, 224)
     if use_gpu:

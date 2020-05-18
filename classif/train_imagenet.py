@@ -284,7 +284,7 @@ def main_worker(gpu, ngpus_per_node, args):
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
 
-    if args.use_le_admm or args.flip_diffuser_im:
+    if args.use_le_admm:
         if args.flip_diffuser_im:
             print("flipping diffuser images")
             trans = transforms.Compose([FlipUDTrans(), transforms.ToTensor()])
@@ -296,18 +296,20 @@ def main_worker(gpu, ngpus_per_node, args):
             trans)
     else:
         if args.flip_diffuser_im:  
-            print("WARNING: random flip and random crop on diffuser im could result in errors in wrong training")
+            print(" Using random shifts in diffuser image colorization ")
             trans = transforms.Compose([FlipUDTrans(),
-                        transforms.RandomResizedCrop(224),
-                        transforms.RandomHorizontalFlip(),
+                        transforms.ColorJitter(brightness = .5, contrast=.3, saturation=.3),
+                        transforms.Resize((224, 224)),
                         transforms.ToTensor(),
                         normalize,
                     ])
         else:
-            print("resizing and normalizin training data")
+            print("resizing and normalizing training data")
             trans = transforms.Compose([
-                        transforms.Resize(224), #used to be random resized crop
-                        # transforms.RandomHorizontalFlip(),
+                        transforms.ColorJitter(brightness = .5, contrast=.3, saturation=.3),
+                        transforms.RandomRotation(45),
+                        transforms.RandomResizedCrop(224), #used to be random resized crop 
+                        transforms.RandomHorizontalFlip(),
                         transforms.ToTensor(),
                         normalize,
                     ])
@@ -325,16 +327,17 @@ def main_worker(gpu, ngpus_per_node, args):
         train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
         num_workers=args.workers, pin_memory=True, sampler=train_sampler)
 
-    if args.use_le_admm:
+    if args.use_le_admm or args.flip_diffuser_im:
         val_loader = torch.utils.data.DataLoader(
-            datasets.ImageFolder(valdir, trans),
+                datasets.ImageFolder(valdir, transforms.Compose([FlipUDTrans(),
+                    transforms.Resize((224, 224)), transforms.ToTensor(), normalize])),
             batch_size=args.batch_size, shuffle=False,
             num_workers=args.workers, pin_memory=True)
     else:
         val_loader = torch.utils.data.DataLoader(
             datasets.ImageFolder(valdir, transforms.Compose([
-                transforms.Resize(224),
-             #   transforms.CenterCrop(224),
+                transforms.Resize(256),
+                transforms.CenterCrop(224),
                 transforms.ToTensor(),
                 normalize,
             ])),
@@ -368,7 +371,7 @@ def main_worker(gpu, ngpus_per_node, args):
                 'state_dict': model.state_dict(),
                 'best_acc1': best_acc1,
                 'optimizer' : optimizer.state_dict(),
-            }, is_best, filename=args.save_path)
+            }, is_best, filename=args.save_path + 'checkpoint')
 
 
 def train(train_loader, model, criterion, optimizer, epoch, args):
