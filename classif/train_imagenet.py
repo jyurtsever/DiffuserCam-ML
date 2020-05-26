@@ -290,7 +290,7 @@ def main_worker(gpu, ngpus_per_node, args):
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
 
-    if args.forward_trans:
+    if args.use_forward_trans:
         print("using the forward trans")
         trans = transforms.Compose(
             [transforms.RandomHorizontalFlip(), CenterDisplayTrans(), SimForwardTrans(), transforms.ToTensor()])
@@ -641,14 +641,10 @@ class SimForwardTrans:
 
     def __call__(self, img):
         res = np.zeros(img.shape)
-        print("aousd yoooo")
-        plt.imshow(img)
-        plt.show()
         for i in range(3):
             res[:, :, i] = fftconvolve(img[:, :, i], self.psf[:, :, i], mode='same')
             res[:, :, i] = res[:, :, i] / np.max(res[:, :, i])
-        return res
-
+        return (res*255).astype('uint8')
 
 
 def rescale(img, width=None, height=None):
