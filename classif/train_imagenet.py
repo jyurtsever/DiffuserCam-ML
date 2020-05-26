@@ -23,6 +23,7 @@ import sys
 import skimage
 import numpy as np
 from scipy.signal import convolve2d, fftconvolve
+from random import randint
 
 sys.path.append('./models/')
 import admm_model as admm_model_plain
@@ -61,6 +62,9 @@ parser.add_argument('-use_le_admm', dest='use_le_admm', action='store_true',
 
 parser.add_argument('-use_forward_trans', dest='use_forward_trans', action='store_true',
                     help='runs the forward model on dataset during training in order to use data augmentation')
+
+parser.add_argument('-use_random_loc_trans', dest='use_random_loc_trans', action='store_true',
+                    help='resize and center randomly before running forward ')
 
 parser.add_argument('-train_admm', dest='train_admm', action='store_true',
                         help='train admm hyper parameters')
@@ -292,8 +296,12 @@ def main_worker(gpu, ngpus_per_node, args):
 
     if args.use_forward_trans:
         print("using the forward trans")
-        trans = transforms.Compose(
-            [transforms.RandomHorizontalFlip(), CenterDisplayTrans(), SimForwardTrans(), transforms.ToTensor()])
+        if args.use_random_loc_trans:
+            trans = transforms.Compose(
+                [transforms.RandomHorizontalFlip(), RandomLocAndSize(), SimForwardTrans(), transforms.ToTensor()])
+        else:
+            trans = transforms.Compose(
+                [transforms.RandomHorizontalFlip(), CenterDisplayTrans(), SimForwardTrans(), transforms.ToTensor()])
 
     elif args.use_le_admm:
         if args.flip_diffuser_im:
@@ -584,36 +592,28 @@ class FlipUDTrans:
         return TF.vflip(img)
 
 
+class RandomLocAndSize:
+    '''Outpus image of size out_dim with image in random part of the space'''
 
-# class RandomLocAndSize:
-#     '''Outpus image of size out_dim with image in random part of the space'''
-#     def __init__(self, out_dim=(270, 480)):
-#         self.out_dim = out_dim
-#
-#     def __call__(self, img):
-#         res = np.zeros(self.out_dim + (3,)).astype('uint8')
-#         rh = res.shape[0]
-#         rw = res.shape[1]
-#         if img.shape[0] / img.shape[1] > self.out_dim[0] / self.out_dim[1]:  # img more vertical than psf
-#             img = rescale(img, height=self.out_dim[0])
-#             res[:, (rw - img.shape[1]) // 2:(rw + img.shape[1]) // 2, :] = img
-#         else:  # img more horizontal than psf
-#             img = rescale(img, width=self.out_dim[1])
-#             res[(rh - img.shape[0]) // 2:(rh + img.shape[0]) // 2, :, :] = img
-#         return res.astype(np.float32) / 255
+    def __init__(self, out_dim=(270, 480)):
+        self.out_dim = out_dim
 
-# class SimForwardTrans:
-#     '''Simulates the forward model run on a normal image'''
-#     def __init__(self, psf_file='../../recon_files/psf_white_LED_Nick.tiff', rescale_fact=4):
-#         self.psf = imread_to_normalized_float(psf_file)
-#         self.psf = rescale(self.psf, height=self.psf.shape[0] // rescale_fact)
-#
-#     def __call__(self, img):
-#         res = np.zeros(img.shape)
-#         for i in range(3):
-#             res[:, :, i] = fftconvolve(img[:, :, i], self.psf[:, :, i], mode='same')
-#             res[:, :, i] = res[:, :, i] / np.max(res[:, :, i])
-#         return res
+    def __call__(self, img):
+        res = np.zeros(self.out_dim + (3,)).astype('uint8')
+        rh = res.shape[0]  # res height
+        rw = res.shape[1]  # res width
+        img = np.array(img)
+
+        if img.shape[0] / img.shape[1] > self.out_dim[0] / self.out_dim[1]:  # img more vertical than psf
+            img = rescale(img, height=randint(self.out_dim[0] // 1.5, self.out_dim[0] - 1))
+        else:  # img more horizontal than psf
+            img = rescale(img, width=randint(self.out_dim[1] // 1.5, self.out_dim[1] - 1))
+
+        top_index = randint(0, rh - img.shape[0] - 1)
+        left_index = randint(0, rw - img.shape[1] - 1)
+        res[top_index: top_index + img.shape[0], left_index: left_index + img.shape[1], :] = img
+        return res.astype(np.float32) / 255
+
 
 class CenterDisplayTrans():
     '''Outpus image of size out_dim with image in random part of the space'''
