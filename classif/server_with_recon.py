@@ -71,7 +71,7 @@ def ensemble_forward(frame):
 
     out, recon = model(input_)
     recon = recon[0].cpu().detach()
-    recon = ((preplot(recon.numpy())*255).astype('uint8'))[...,::-1] #used to flip
+    recon = np.flipud((preplot(recon.numpy())*255).astype('uint8'))[...,::-1] #used to flip
     out = out.cpu()
     return out, recon
 

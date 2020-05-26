@@ -18,9 +18,12 @@ import torchvision.transforms as transforms
 import torchvision.transforms.functional as TF
 import torchvision.datasets as datasets
 import torchvision.models as models
+import cv2
 import sys
 import skimage
 import numpy as np
+from scipy.signal import convolve2d, fftconvolve
+
 sys.path.append('./models/')
 import admm_model as admm_model_plain
 from utils import load_psf_image, preplot
@@ -55,6 +58,9 @@ parser.add_argument("-psf_file", type=str, default= '../../recon_files/psf_white
 
 parser.add_argument('-use_le_admm', dest='use_le_admm', action='store_true',
                     help='use learned admm and train with it')
+
+parser.add_argument('-use_forward_trans', dest='use_forward_trans', action='store_true',
+                    help='runs the forward model on dataset during training in order to use data augmentation')
 
 parser.add_argument('-train_admm', dest='train_admm', action='store_true',
                         help='train admm hyper parameters')
@@ -284,16 +290,18 @@ def main_worker(gpu, ngpus_per_node, args):
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
 
-    if args.use_le_admm:
+    if args.forward_trans:
+        print("using the forward trans")
+        trans = transforms.Compose(
+            [transforms.RandomHorizontalFlip(), CenterDisplayTrans(), SimForwardTrans(), transforms.ToTensor()])
+
+    elif args.use_le_admm:
         if args.flip_diffuser_im:
             print("flipping diffuser images")
             trans = transforms.Compose([FlipUDTrans(), transforms.ToTensor()])
         else:
             trans = transforms.Compose([transforms.ToTensor()])
 
-        train_dataset = datasets.ImageFolder(
-            traindir,
-            trans)
     else:
         if args.flip_diffuser_im:  
             print(" Using random shifts in diffuser image colorization ")
@@ -313,9 +321,9 @@ def main_worker(gpu, ngpus_per_node, args):
                         transforms.ToTensor(),
                         normalize,
                     ])
-        train_dataset = datasets.ImageFolder(
-            traindir,
-            trans)
+    train_dataset = datasets.ImageFolder(
+        traindir,
+        trans)
 
 
     if args.distributed:
@@ -576,6 +584,91 @@ class FlipUDTrans:
         return TF.vflip(img)
 
 
+
+# class RandomLocAndSize:
+#     '''Outpus image of size out_dim with image in random part of the space'''
+#     def __init__(self, out_dim=(270, 480)):
+#         self.out_dim = out_dim
+#
+#     def __call__(self, img):
+#         res = np.zeros(self.out_dim + (3,)).astype('uint8')
+#         rh = res.shape[0]
+#         rw = res.shape[1]
+#         if img.shape[0] / img.shape[1] > self.out_dim[0] / self.out_dim[1]:  # img more vertical than psf
+#             img = rescale(img, height=self.out_dim[0])
+#             res[:, (rw - img.shape[1]) // 2:(rw + img.shape[1]) // 2, :] = img
+#         else:  # img more horizontal than psf
+#             img = rescale(img, width=self.out_dim[1])
+#             res[(rh - img.shape[0]) // 2:(rh + img.shape[0]) // 2, :, :] = img
+#         return res.astype(np.float32) / 255
+
+# class SimForwardTrans:
+#     '''Simulates the forward model run on a normal image'''
+#     def __init__(self, psf_file='../../recon_files/psf_white_LED_Nick.tiff', rescale_fact=4):
+#         self.psf = imread_to_normalized_float(psf_file)
+#         self.psf = rescale(self.psf, height=self.psf.shape[0] // rescale_fact)
+#
+#     def __call__(self, img):
+#         res = np.zeros(img.shape)
+#         for i in range(3):
+#             res[:, :, i] = fftconvolve(img[:, :, i], self.psf[:, :, i], mode='same')
+#             res[:, :, i] = res[:, :, i] / np.max(res[:, :, i])
+#         return res
+
+class CenterDisplayTrans():
+    '''Outpus image of size out_dim with image in random part of the space'''
+    def __init__(self, out_dim=(270, 480)):
+        self.out_dim = out_dim
+
+    def __call__(self, img):
+        res = np.zeros(self.out_dim + (3,)).astype('uint8')
+        rh = res.shape[0]
+        rw = res.shape[1]
+        img = np.array(img)
+        if img.shape[0] / img.shape[1] > self.out_dim[0] / self.out_dim[1]:  # img more vertical than psf
+            img = rescale(img, height=self.out_dim[0])
+            res[:, (rw - img.shape[1]) // 2:(rw + img.shape[1]) // 2, :] = img
+        else:  # img more horizontal than psf
+            img = rescale(img, width=self.out_dim[1])
+            res[(rh - img.shape[0]) // 2:(rh + img.shape[0]) // 2, :, :] = img
+        return res.astype(np.float32) / 255
+
+class SimForwardTrans:
+    '''Simulates the forward model run on a normal image'''
+    def __init__(self, psf_file='../../recon_files/psf_white_LED_Nick.tiff', rescale_fact=4):
+        self.psf = imread_to_normalized_float(psf_file)
+        self.psf = rescale(self.psf, height=self.psf.shape[0] // rescale_fact)
+
+    def __call__(self, img):
+        res = np.zeros(img.shape)
+        print("aousd yoooo")
+        plt.imshow(img)
+        plt.show()
+        for i in range(3):
+            res[:, :, i] = fftconvolve(img[:, :, i], self.psf[:, :, i], mode='same')
+            res[:, :, i] = res[:, :, i] / np.max(res[:, :, i])
+        return res
+
+
+
+def rescale(img, width=None, height=None):
+    if not width and not height:
+        raise AssertionError
+    if width:
+        scale = width/img.shape[1]
+        height = int(img.shape[0] * scale)
+    else:
+        scale = height / img.shape[0]
+        width = int(img.shape[1] * scale)
+    dim = (width, height)
+    # resize image
+    resized = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+    return resized
+
+
+"""Reads image to float values between 0 and 1"""
+def imread_to_normalized_float(im_name):
+    return cv2.imread(im_name)[...,::-1].astype(np.float32)/255
 
 if __name__ == '__main__':
     main()

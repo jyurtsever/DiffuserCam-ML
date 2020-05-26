@@ -47,44 +47,45 @@ def main():
     converter.OutputPixelFormat = pylon.PixelType_BGR8packed
     converter.OutputBitAlignment = pylon.OutputBitAlignment_MsbAligned
 
-    tk = Tk()
+    # tk = Tk()
+    #
+    # w = Scale(tk, from_=10, to=100000, orient=HORIZONTAL, sliderlength=30, length=300, width=20)
+    # w.pack()
 
-    w = Scale(tk, from_=10, to=100000, orient=HORIZONTAL, sliderlength=30, length=300, width=20)
-    w.pack()
+    # def loop():
+    #     if camera.IsGrabbing():
+    while camera.IsGrabbing():
+        try:
+            grabResult = camera.RetrieveResult(args.exposure_time, pylon.TimeoutHandling_ThrowException)
+            if grabResult.GrabSucceeded():
+                # Access the image data
+                image = converter.Convert(grabResult)
+                frame = image.GetArray()
+                frame = rescale(frame, .45, width=480)
+                r, image = cv2.imencode('.jpg', frame)#, encode_param)
+                client.send(image)
 
-    def loop():
-        if camera.IsGrabbing():
-            try:
-                grabResult = camera.RetrieveResult(w.get(), pylon.TimeoutHandling_ThrowException)
-                if grabResult.GrabSucceeded():
-                    # Access the image data
-                    image = converter.Convert(grabResult)
-                    frame = image.GetArray()
-                    frame = rescale(frame, .45, width=480)
-                    r, image = cv2.imencode('.tiff', frame)#, encode_param)
-                    client.send(image)
-
-                    recon = receive_img(data)
-                    show_frame(recon)
-                grabResult.Release()
-                camera.ExposureTime.SetValue(w.get())
-                print(camera.ExposureTime.GetValue())
-                w.pack()
-                tk.after(1000, loop)
-            except (KeyboardInterrupt, EOFError) as e:
-                # Releasing the resource
-                camera.StopGrabbing()
-                camera.Close()
-                cv2.destroyAllWindows()
-
-        # Releasing the resource
-        else:
+                recon = receive_img(data)
+                show_frame(recon)
+            grabResult.Release()
+            # camera.ExposureTime.SetValue(w.get())
+            print(camera.ExposureTime.GetValue())
+            # w.pack()
+            # tk.after(10, loop)
+        except (KeyboardInterrupt, EOFError) as e:
+            # Releasing the resource
             camera.StopGrabbing()
             camera.Close()
             cv2.destroyAllWindows()
 
-    tk.after(0, loop)
-    tk.mainloop()
+    #     # Releasing the resource
+    #     else:
+    #         camera.StopGrabbing()
+    #         camera.Close()
+    #         cv2.destroyAllWindows()
+    #
+    # tk.after(0, loop)
+    # tk.mainloop()
 
 
 def receive_img(data):
