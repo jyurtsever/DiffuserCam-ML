@@ -34,7 +34,7 @@ def main(args):
 
 if __name__ == '__main__':
     random.seed(123)
-    parser = argparse.ArgumentParser(description='runs forward model on the first n images in a folder')
+    parser = argparse.ArgumentParser(description='Makes a train and validation folder in dataset')
     parser.add_argument('-root', type=str)
     parser.add_argument('-frac_validation', type=float, default=.08)
     args = parser.parse_args()

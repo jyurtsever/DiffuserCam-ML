@@ -295,8 +295,9 @@ def main_worker(gpu, ngpus_per_node, args):
                                      std=[0.229, 0.224, 0.225])
 
     if args.use_forward_trans:
-        print("using the forward trans")
+        print("using forward transformation")
         if args.use_random_loc_trans:
+            print("using random locations transformation")
             trans = transforms.Compose(
                 [transforms.RandomHorizontalFlip(), RandomLocAndSize(), SimForwardTrans(), transforms.ToTensor()])
         else:
@@ -343,7 +344,13 @@ def main_worker(gpu, ngpus_per_node, args):
         train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
         num_workers=args.workers, pin_memory=True, sampler=train_sampler)
 
-    if args.use_le_admm or args.flip_diffuser_im:
+    if args.use_forward_trans:
+        val_loader = torch.utils.data.DataLoader(
+                            datasets.ImageFolder(valdir, trans),
+                            batch_size=args.batch_size, shuffle=False,
+                            num_workers=args.workers, pin_memory=True)
+    
+    elif args.use_le_admm or args.flip_diffuser_im:
         val_loader = torch.utils.data.DataLoader(
                 datasets.ImageFolder(valdir, transforms.Compose([FlipUDTrans(),
                     transforms.Resize((224, 224)), transforms.ToTensor(), normalize])),
