@@ -124,7 +124,7 @@ python3 train_imagenet.py image_net_directory -save_path path_to_save_your_model
 
 
 # For Running Live Classification 
-1. Using Webcam as a test
+1. Using Webcam video from laptop
   - In server (can be over ssh): 
   ```
   cd classif
@@ -134,3 +134,15 @@ python3 train_imagenet.py image_net_directory -save_path path_to_save_your_model
   ```
   python3 client.py
   ```
+
+2. Using DiffuserCam
+  - In server (over ssh): 
+    
+    ```
+    python3 server_with_recon.py path_to_model.pth.tar  -imagenet_train_dir path_to_directory_with_imagenet_training_data -psf_file path_to_psf_file -recon_iters 10
+    ```
+  - In client (laptop connected to DiffuserCam)
+    
+    ```
+    python3 pylon_client_with_recon.py
+    ```
