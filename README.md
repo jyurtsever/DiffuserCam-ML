@@ -4,7 +4,7 @@ Machine Learning techniques applied to enhance DiffuserCam image quality and cla
 
 
 
-**For training diffusercam image classifier**
+#For training diffusercam image classifier
 
 usage: train_imagenet.py [-h] [--arch ARCH] [-j N] [--epochs N] [--start-epoch N] [-b N]
                [--lr LR] [--momentum M] [--weight-decay W] [--print-freq N]
