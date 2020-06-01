@@ -74,7 +74,6 @@ optional arguments:
   --dist-url DIST_URL   url used to set up distributed training
   
   --dist-backend DIST_BACKEND
-  
                         distributed backend
   --seed SEED           seed for initializing training.
   
