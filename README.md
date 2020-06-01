@@ -6,6 +6,7 @@ Machine Learning techniques applied to enhance DiffuserCam image quality and cla
 
 # For training diffusercam image classifier
 
+```
 usage: train_imagenet.py [-h] [--arch ARCH] [-j N] [--epochs N] [--start-epoch N] [-b N]
                [--lr LR] [--momentum M] [--weight-decay W] [--print-freq N]
                [--resume PATH] [-e] [--pretrained] [--world-size WORLD_SIZE]
@@ -83,13 +84,13 @@ optional arguments:
                         processes per node, which has N GPUs. This is the
                         fastest way to use PyTorch for either single node or
                         multi node data parallel training
+```
 
 
 
 
 
-
-Examples:
+###### Examples:
 
 Train classifier on imagenet dataset of normal images: 
 ```
