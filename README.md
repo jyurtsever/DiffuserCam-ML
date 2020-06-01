@@ -4,7 +4,7 @@ Machine Learning techniques applied to enhance DiffuserCam image quality and cla
 
 
 
-For training diffusercam image classifier
+**For training diffusercam image classifier**
 
 usage: train_imagenet.py [-h] [--arch ARCH] [-j N] [--epochs N] [--start-epoch N] [-b N]
                [--lr LR] [--momentum M] [--weight-decay W] [--print-freq N]
@@ -15,7 +15,6 @@ usage: train_imagenet.py [-h] [--arch ARCH] [-j N] [--epochs N] [--start-epoch N
                [-use_forward_trans] [-psf_file] [-use_le_admm] [-use_random_loc_trans] [-train_admm]
                DIR
 
-PyTorch ImageNet Training
 
 positional arguments:
   DIR                   path to dataset
@@ -93,22 +92,35 @@ optional arguments:
 Examples:
 
 Train classifier on imagenet dataset of normal images: 
+```
 python3 train_imagenet.py image_net_directory -save_path path_to_save_your_model
+```
 
 Train classifier on imagenet dataset of DiffuserCam images: 
+```
 python3 train_imagenet.py image_net_directory -save_path path_to_save_your_model -use_forward_trans
+```
 
 Train classifier on imagenet dataset of DiffuserCam images with data augmentation: 
+```
 python3 train_imagenet.py image_net_directory -save_path path_to_save_your_model -psf_file path_to_psf -use_forward_trans -use_random_loc_trans
+```
 
 Train classifier on imagenet dataset of DiffuserCam images with 10 iterations of learned reconstruction: 
+```
 python3 train_imagenet.py image_net_directory -save_path path_to_save_your_model -psf_file path_to_psf -use_forward_trans
+```
 
 Train classifier on imagenet dataset of DiffuserCam images with ten iterations of pretrained admm: 
+```
 python3 train_imagenet.py image_net_directory -save_path path_to_save_your_model -psf_file path_to_psf -use_le_admm
+```
 
 Train classifier on imagenet dataset of DiffuserCam images with ten iterations: 
+```
 python3 train_imagenet.py image_net_directory -save_path path_to_save_your_model -psf_file path_to_psf -use_le_admm
+```
+
 
 
 
