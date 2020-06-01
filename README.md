@@ -93,6 +93,7 @@ Examples:
 
 Train classifier on imagenet dataset of normal images: 
 ```
+cd classif
 python3 train_imagenet.py image_net_directory -save_path path_to_save_your_model
 ```
 
@@ -122,5 +123,14 @@ python3 train_imagenet.py image_net_directory -save_path path_to_save_your_model
 ```
 
 
-
-
+# For Running Live Classification 
+1. Using Webcam as a test
+  - In server (can be over ssh): 
+  ```
+  cd classif
+  python3 server.py path_to_saved_model -imagenet_train_dir path_to_imagenet_training_images_folder
+  ```
+  - In client (your laptop)
+  ```
+  python3 client.py
+  ```
