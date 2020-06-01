@@ -23,8 +23,8 @@ from PIL import Image
 from collections import OrderedDict
 
 HOST = ''
-IMG_PORT = 8098
-ARR_PORT = 8097
+IMG_PORT = 8090
+ARR_PORT = 8091
 
 
 
@@ -155,6 +155,7 @@ if __name__ == '__main__':
     parser.add_argument("-use_le_admm", dest='use_le_admm', action='store_true')
     parser.add_argument('-use_ensemble', dest='use_ensemble', action='store_true')
     parser.add_argument('-load_le_admm', dest='load_le_admm', action='store_true')
+    parser.add_argument('-square_trans', dest='square_trans', action='store_true')
     args = parser.parse_args()
 
 
@@ -187,10 +188,13 @@ if __name__ == '__main__':
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
             # from http://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html
         ])
-    else:
+    elif args.square_trans:
         print("using only square crop transformation")
         trans = transforms.Compose([transforms.Resize((224, 224)), transforms.ToTensor(),     
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+
+    else:
+        trans = transforms.Compose([transforms.ToTensor()])
 
     # $url = 'https://gist.githubusercontent.com/yrevar/942d3a0ac09ec9e5eb3a/' \
     #       'raw/596b27d23537e5a1b5751d2b0481ef172f58b539/imagenet1000_clsid_to_human.txt'

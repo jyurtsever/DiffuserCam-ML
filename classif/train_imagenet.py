@@ -179,7 +179,7 @@ def make_admm_model(args):
         learning_options = {'learned_vars': var_options['plain_admm']}
 
 
-    model = admm_model_plain.ADMM_Net(batch_size=1, h=h, iterations=5,
+    model = admm_model_plain.ADMM_Net(batch_size=1, h=h, iterations=10,
                                       learning_options=learning_options, cuda_device=my_device)
 
     le_admm = torch.load('../../saved_models/model_le_admm.pt', map_location=my_device)
