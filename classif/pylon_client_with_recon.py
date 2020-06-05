@@ -9,9 +9,9 @@ import struct
 from tkinter import *
 
 HOST = '128.32.112.46'
-IMG_PORT = 8098
-ARR_PORT = 8097
-RECON_PORT = 8099
+IMG_PORT = 8090
+ARR_PORT = 8091
+RECON_PORT = 8092
 
 
 def main():
@@ -130,7 +130,7 @@ def rescale(img, scale, width=None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Exposure and Gain')
-    parser.add_argument('-exposure_time', type=int, default=0)
+    parser.add_argument('-exposure_time', type=int, default=30000)
     parser.add_argument('-gain', type=float, default=0.0)
     parser.add_argument('-srgb', type=str, default='rgb')
     parser.add_argument('-gamma', type=int, default=1)

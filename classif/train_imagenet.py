@@ -624,6 +624,7 @@ class RandomLocAndSize:
 
 class CenterDisplayTrans():
     '''Outpus image of size out_dim with image in random part of the space'''
+
     def __init__(self, out_dim=(270, 480)):
         self.out_dim = out_dim
 
@@ -642,6 +643,7 @@ class CenterDisplayTrans():
 
 class SimForwardTrans:
     '''Simulates the forward model run on a normal image'''
+
     def __init__(self, psf_file='../../recon_files/psf_white_LED_Nick.tiff', rescale_fact=4):
         self.psf = imread_to_normalized_float(psf_file)
         self.psf = rescale(self.psf, height=self.psf.shape[0] // rescale_fact)

@@ -1,12 +1,9 @@
 import cv2
-import numpy as np
 import socket
 import pickle
-import os
-import struct ### new code
 import imagiz
-import time
-HOST = '128.32.112.46'
+import argparse
+# HOST = '128.32.112.46'
 IMG_PORT = 8098
 ARR_PORT = 8097
 
@@ -42,18 +39,20 @@ def main():
             break
 
 
-"""Displays Live Video In Opencv Window"""
 
 
 def show_frame(frame):
+    """Displays Live Video In Opencv Window"""
+
     cv2.imshow("Frame", frame)
     cv2.waitKey(1)
 
 
-"""Resizes image according by the decimal scale (e.g .5)"""
 
 
 def rescale(img, scale, width=None):
+    """Resizes image according by the decimal scale (e.g .5)"""
+
     if width:
         scale = width/img.shape[1]
     else:
@@ -67,6 +66,10 @@ def rescale(img, scale, width=None):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("ip_addr", type=str)
+    args = parser.parse_args()
+    HOST = args.ip_addr
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((HOST, ARR_PORT))
     main()
