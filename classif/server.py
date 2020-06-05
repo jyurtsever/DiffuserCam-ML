@@ -82,9 +82,11 @@ def fix_state_dict(state_dict):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("model_dir", type=str)
+    parser.add_argument("-model_dir", default='', type=str)
     parser.add_argument("-imagenet_train_dir", type=str,
-                         default='/home/jyurtsever/research/sim_train/data/imagenet_forward_2/train')
+                         default='')
+    parser.add_argument('--pretrained', dest='pretrained', action='store_true',
+                        help='use pre-trained model')
     args = parser.parse_args()
 
 
@@ -98,10 +100,27 @@ if __name__ == '__main__':
 
     # Read the network from Memory
     print("Initializing Model")
-    net = models.resnet18(num_classes=1000)
-    checkpoint = torch.load(args.model_dir)
-    #print(checkpoint.keys())
-    net.load_state_dict(fix_state_dict(checkpoint['state_dict']))
+
+
+    if args.imagenet_train_dir:
+        class_info_json_filepath = './imagenet_class_info.json'
+        with open(class_info_json_filepath) as class_info_json_f:
+            class_info_dict = json.load(class_info_json_f)
+
+        class_wnids = os.listdir(args.imagenet_train_dir)
+        class_wnids.sort()
+        classes = [class_info_dict[class_wnid]["class_name"] for class_wnid in class_wnids]
+        net = models.resnet18(num_classes=1000, pretrained=args.pretrained)
+
+    else:
+        url = 'https://gist.githubusercontent.com/yrevar/942d3a0ac09ec9e5eb3a/' \
+              'raw/596b27d23537e5a1b5751d2b0481ef172f58b539/imagenet1000_clsid_to_human.txt'
+        classes = eval(requests.get(url).content)
+        net = models.resnet18(num_classes=1000, pretrained=args.pretrained)
+
+    if args.model_dir:
+        checkpoint = torch.load(args.model_dir)
+        net.load_state_dict(fix_state_dict(checkpoint['state_dict']))
 
     use_gpu = torch.cuda.is_available()
     if use_gpu:
@@ -115,16 +134,6 @@ if __name__ == '__main__':
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         # from http://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html
     ])
-
-    # $url = 'https://gist.githubusercontent.com/yrevar/942d3a0ac09ec9e5eb3a/' \
-    #       'raw/596b27d23537e5a1b5751d2b0481ef172f58b539/imagenet1000_clsid_to_human.txt'
-    class_info_json_filepath = './imagenet_class_info.json'
-    with open(class_info_json_filepath) as class_info_json_f:
-        class_info_dict = json.load(class_info_json_f)
-
-    class_wnids = os.listdir(args.imagenet_train_dir)
-    class_wnids.sort()
-    classes = [class_info_dict[class_wnid]["class_name"] for class_wnid in class_wnids]
 
     print("Model created")
     s.listen(1)
