@@ -29,7 +29,6 @@ ARR_PORT = 8091
 #     return trans(frame)
 
 def net_forward(frame):
-    print(frame.dtype)
     image = Image.fromarray(frame)
     image = trans(image).view(1, 3, 224, 224)
     if use_gpu:
@@ -128,7 +127,7 @@ if __name__ == '__main__':
     net.eval()
 
     trans = transforms.Compose([
-        transforms.Scale(224),
+        transforms.Resize(224),
         transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
