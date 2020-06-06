@@ -125,6 +125,18 @@ python3 train_imagenet.py image_net_directory -save_path path_to_save_your_model
 
 
 # For Running Live Classification 
+
+### Quickstart
+- On your server, run
+```
+python3 server.py --pretrained
+```
+- Then, on your laptop, run
+
+```
+python3 webcam_client.py your.server.ip.address
+```
+
 1. Using Webcam video from laptop
   - In server (can be over ssh): 
   ```
