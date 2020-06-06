@@ -5,6 +5,16 @@ Machine Learning techniques applied to enhance DiffuserCam image quality and cla
 # For Running Live Classification 
 
 ### Quickstart
+Clone this repo on both your server and your laptop
+```
+git clonehttps://github.com/jyurtsever/DiffuserCam-ML.git
+cd DiffuserCam-ML/classif/
+```
+Install the requirements for classification
+```
+pip3 install -r requirements.txt
+```
+
 - On your server, run
 ```
 python3 server.py --pretrained
