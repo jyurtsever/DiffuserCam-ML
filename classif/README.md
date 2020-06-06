@@ -10,7 +10,7 @@ Clone this repo on both your server and your laptop
 git clonehttps://github.com/jyurtsever/DiffuserCam-ML.git
 cd DiffuserCam-ML/classif/
 ```
-Install the requirements for classification
+Install the requirements for classification on both laptop and server
 ```
 pip3 install -r requirements.txt
 ```
