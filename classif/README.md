@@ -136,7 +136,7 @@ python3 server.py --pretrained
 ```
 python3 webcam_client.py your.server.ip.address
 ```
-
+### Documentation
 1. Using Webcam video from laptop
   - In server (can be over ssh): 
   ```
