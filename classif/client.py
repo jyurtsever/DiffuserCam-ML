@@ -4,8 +4,8 @@ import pickle
 import imagiz
 import argparse
 # HOST = '128.32.112.46'
-IMG_PORT = 8098
-ARR_PORT = 8097
+IMG_PORT = 8090
+ARR_PORT = 8091
 
 
 def main():
