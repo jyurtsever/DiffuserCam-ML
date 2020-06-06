@@ -4,8 +4,8 @@ import pickle
 import imagiz
 import argparse
 # HOST = '128.32.112.46'
-IMG_PORT = 8090
-ARR_PORT = 8091
+# IMG_PORT = 8090
+# ARR_PORT = 8091
 
 
 def main():
@@ -68,7 +68,10 @@ def rescale(img, scale, width=None):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("ip_addr", type=str)
+    parser.add_argument("--port", type=int, default=8090)
     args = parser.parse_args()
+    IMG_PORT = args.port
+    ARR_PORT = IMG_PORT + 1
     HOST = args.ip_addr
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((HOST, ARR_PORT))

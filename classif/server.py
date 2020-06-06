@@ -1,34 +1,23 @@
 import pickle
 import socket
 import os
-import torchvision
 import torch.nn as nn
-import numpy as np
 import requests
-import skimage
 import argparse
 import imagiz
 import torch
 import cv2
 import json
-import time
 from torchvision import models, transforms
 from PIL import Image
 from collections import OrderedDict
 
 HOST = ''
-IMG_PORT = 8090
-ARR_PORT = 8091
-# ARR_PORT_2 = 8099
-# body_parts = ['Nose', 'Neck', 'Right Shoulder', 'Right Elbow', 'Right Wrist',
-#               'Left Shoulder', 'Left Elbow', 'Left Wrist', 'Right Hip', 'Right Knee', 'Right Ankle',
-#               'Left Hip', 'Left Knee', 'LAnkle', 'Right Eye', 'Left Eye', 'Right Ear', 'Left Ear', 'Background']
-
-
-# def initialize(frame, flip=False):
-#     return trans(frame)
+# IMG_PORT = 8090
+# ARR_PORT = 8091
 
 def net_forward(frame):
+    """Runs the classifier network given an image"""
     image = Image.fromarray(frame)
     image = trans(image).view(1, 3, 224, 224)
     if use_gpu:
@@ -40,11 +29,13 @@ def net_forward(frame):
 
 
 def get_classes(out):
+    """Returns the top 7 classes with their respective probabilities"""
     _, indices = torch.sort(out, descending=True)
     percentage = torch.nn.functional.softmax(out, dim=1)[0]
     return [(classes[idx.item()], round(percentage[idx.item()].item(),2)) for idx in indices[0][:7]]
 
 def main():
+    """Recieves Webcam Images from Client and Classifies them"""
     print("Connecting...")
     server = imagiz.Server(port=IMG_PORT)
     print("Connected...")
@@ -69,6 +60,7 @@ def main():
     print("\nSession Ended")
 
 def fix_state_dict(state_dict):
+    """Fixes the state dictionary of a pretrained model in order to load it"""
     new_state_dict = OrderedDict()
     for k, v in state_dict.items():
         if k[:7] == 'module.':
@@ -86,8 +78,11 @@ if __name__ == '__main__':
                          default='')
     parser.add_argument('--pretrained', dest='pretrained', action='store_true',
                         help='use pre-trained model')
+    parser.add_argument("--port", type=int, default=8090)
     args = parser.parse_args()
 
+    IMG_PORT = args.port
+    ARR_PORT = IMG_PORT + 1
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
