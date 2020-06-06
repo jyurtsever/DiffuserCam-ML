@@ -1,0 +1,6 @@
+opencv-python
+imagiz
+pickle-mixin
+torch
+torchvision
+Pillow
