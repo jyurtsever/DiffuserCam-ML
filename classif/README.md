@@ -2,6 +2,77 @@
 Machine Learning techniques applied to enhance DiffuserCam image quality and classify DiffuserCam images using PyTorch 
 
 
+# For Running Live Classification 
+
+### Quickstart
+- On your server, run
+```
+python3 server.py --pretrained
+```
+- Then, on your laptop, run
+
+```
+python3 webcam_client.py your.server.ip.address
+```
+### Documentation
+1. Using Webcam video from laptop
+  - In server (can be over ssh): 
+  ```
+  usage: server.py [-model_dir] [-imagenet_train_dir] [--pretrained] [--port]
+  
+  Arguments:
+    
+    -model_dir (optional)              directory with pretrained model .pth or pt file 
+    -imagenet_train_dir (optional)     directory containing imagenet training data - used to tell the order of classes
+                                       if argument not provided, will use default 1000 imagenet classes
+    
+    --pretrained (optional)            will use pretrained model from internet with 1000 imagenet classes
+    --port (optional)                  specifies the port you would like to use (default 8090)
+    
+  ```
+  Examples:
+  
+  Classify your webcam images using a model you trained on some imagenet images:
+  ```
+  python3 server.py -model_dir path/to/saved/model.pth -imagenet_train_dir path/to/imagenet/training/images/folder
+  ```
+  
+  Classify webcam images using a model trained on the internet on 1000 imagenet classes:
+  
+  ```
+  python3 server.py --pretrained
+  ```
+    
+  
+  - In webcam_client (on your laptop)
+  ```
+    usage: webcam_client.py IP_ADDRESS [--port]
+  
+  Positional Arguments:
+    IP_ADDRESS           the ip address of the server you are connecting to
+  
+  Optional Arguments:
+    --port               the port you would like to connect to (default 8090)
+  ```
+  
+  Example:
+  
+  Run the webcam on your laptop connecting to server with ip address 555.55.555.55
+  ```
+  python3 webcam_client.py 555.55.555.55
+  ```
+
+2. Using DiffuserCam
+  - In server (over ssh): 
+    
+    ```
+    python3 server_with_recon.py path_to_model.pth.tar  -imagenet_train_dir path_to_directory_with_imagenet_training_data -psf_file path_to_psf_file -recon_iters 10
+    ```
+  - In client (laptop connected to DiffuserCam)
+    
+    ```
+    python3 pylon_client_with_recon.py
+    ```
 
 
 # For training diffusercam image classifier
@@ -124,74 +195,3 @@ python3 train_imagenet.py image_net_directory -save_path path_to_save_your_model
 ```
 
 
-# For Running Live Classification 
-
-### Quickstart
-- On your server, run
-```
-python3 server.py --pretrained
-```
-- Then, on your laptop, run
-
-```
-python3 webcam_client.py your.server.ip.address
-```
-### Documentation
-1. Using Webcam video from laptop
-  - In server (can be over ssh): 
-  ```
-  usage: server.py [-model_dir] [-imagenet_train_dir] [--pretrained] [--port]
-  
-  Arguments:
-    
-    -model_dir (optional)              directory with pretrained model .pth or pt file 
-    -imagenet_train_dir (optional)     directory containing imagenet training data - used to tell the order of classes
-                                       if argument not provided, will use default 1000 imagenet classes
-    
-    --pretrained (optional)            will use pretrained model from internet with 1000 imagenet classes
-    --port (optional)                  specifies the port you would like to use (default 8090)
-    
-  ```
-  Examples:
-  
-  Classify your webcam images using a model you trained on some imagenet images:
-  ```
-  python3 server.py -model_dir path/to/saved/model.pth -imagenet_train_dir path/to/imagenet/training/images/folder
-  ```
-  
-  Classify webcam images using a model trained on the internet on 1000 imagenet classes:
-  
-  ```
-  python3 server.py --pretrained
-  ```
-    
-  
-  - In webcam_client (on your laptop)
-  ```
-    usage: webcam_client.py IP_ADDRESS [--port]
-  
-  Positional Arguments:
-    IP_ADDRESS           the ip address of the server you are connecting to
-  
-  Optional Arguments:
-    --port               the port you would like to connect to (default 8090)
-  ```
-  
-  Example:
-  
-  Run the webcam on your laptop connecting to server with ip address 555.55.555.55
-  ```
-  python3 webcam_client.py 555.55.555.55
-  ```
-
-2. Using DiffuserCam
-  - In server (over ssh): 
-    
-    ```
-    python3 server_with_recon.py path_to_model.pth.tar  -imagenet_train_dir path_to_directory_with_imagenet_training_data -psf_file path_to_psf_file -recon_iters 10
-    ```
-  - In client (laptop connected to DiffuserCam)
-    
-    ```
-    python3 pylon_client_with_recon.py
-    ```
