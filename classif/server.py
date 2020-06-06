@@ -113,7 +113,7 @@ if __name__ == '__main__':
         net = models.resnet18(num_classes=1000, pretrained=args.pretrained)
 
     else:
-        url = 'https://gist.githubusercontent.com/yrevar/942d3a0ac09ecc9e5eb3a/' \
+        url = 'https://gist.githubusercontent.com/yrevar/942d3a0ac09ec9e5eb3a/' \
               'raw/596b27d23537e5a1b5751d2b0481ef172f58b539/imagenet1000_clsid_to_human.txt'
         classes = eval(requests.get(url).content)
         net = models.resnet18(num_classes=1000, pretrained=args.pretrained)
