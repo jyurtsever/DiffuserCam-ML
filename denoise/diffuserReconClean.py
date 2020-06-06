@@ -1,14 +1,8 @@
-
-import numpy as np
 import scipy.io as io
 import scipy.misc
-import matplotlib.pyplot as plt
-from numpy.fft import fft2, ifft2, fftshift, ifftshift
-from PIL import Image
-import math
-from ipywidgets import interact, widgets
+from numpy.fft import fft2
 import cv2
-from DiffuserCamUtils import *
+from denoise.DiffuserCamUtils import *
 import sys, os
 
 
@@ -154,7 +148,7 @@ if __name__ == '__main__':
     start = int(sys.argv[3])
 
     ## Background ###
-    bg_file = '../recon_files/diffuser_background.tiff';
+    bg_file = '../../recon_files/diffuser_background.tiff';
     bg_image = np.array(cv2.imread(bg_file, -1)).astype('float32')
 
     #####   Diffuser Image     #####
@@ -168,7 +162,7 @@ if __name__ == '__main__':
     save_file_path = sys.argv[4]
 
     ####       PSF       ####
-    psf_file = '../recon_files/psf_white_LED_Nick.tiff'
+    psf_file = '../../recon_files/psf_white_LED_Nick.tiff'
     # psf_file = 'D:/Kristina/2_8_2019/greenpsf.bmp'
 
 
@@ -217,7 +211,7 @@ if __name__ == '__main__':
     Xhat = ifft2c(fft2c(b) / H)
 
     ####  CALIBRATION #####
-    calibration_2_15 = io.loadmat('../recon_files/calibration_2_15_v2.mat')
+    calibration_2_15 = io.loadmat('../../recon_files/calibration_2_15_v2.mat')
 
     M = calibration_2_15['M']
     mtx = calibration_2_15['mtx']

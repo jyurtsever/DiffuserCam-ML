@@ -4,9 +4,8 @@
 
 # import model_color as my_model_color
 import progressbar
-import scipy
 import sys
-from ADMM_tf_utils import *
+from denoise.ADMM_tf_utils import *
 
 def main():
     bar = progressbar.ProgressBar(maxval=num_photos, widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])

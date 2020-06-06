@@ -1,4 +1,4 @@
-from resnet import *
+from denoise.resnet import *
 from classifiers import *
 from torch import nn, optim
 import torch
