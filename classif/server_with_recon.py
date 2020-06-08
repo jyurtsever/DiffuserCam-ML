@@ -167,26 +167,9 @@ if __name__ == '__main__':
 
     print('Socket bind complete')
 
-    # Read the network from Memory
-    print("Initializing Model")
-    classifier = models.resnet18(num_classes=1000)
-    checkpoint = torch.load(args.model_dir)
-    #print(checkpoint.keys())
-    if not args.use_ensemble:
-        classifier.load_state_dict(fix_state_dict(checkpoint['state_dict']))
-
-    use_gpu = torch.cuda.is_available()
-    if use_gpu:
-        classifier = classifier.cuda()
-    classifier.eval()
-    
     if args.use_recon:
         trans = transforms.Compose([
-            transforms.Resize(256),
-            transforms.CenterCrop(224),
             transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-            # from http://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html
         ])
     elif args.square_trans:
         print("using only square crop transformation")
@@ -206,7 +189,19 @@ if __name__ == '__main__':
     class_wnids.sort()
     classes = [class_info_dict[class_wnid]["class_name"] for class_wnid in class_wnids]
 
-    print("Model created")
+    # Read the network from Memory
+    print("Initializing Model")
+    classifier = models.resnet18(num_classes=len(classes))
+    checkpoint = torch.load(args.model_dir)
+    if not args.use_ensemble:
+        classifier.load_state_dict(fix_state_dict(checkpoint['state_dict']))
+
+    use_gpu = torch.cuda.is_available()
+    if use_gpu:
+        classifier = classifier.cuda()
+    classifier.eval()
+
+    print(f"Model created with number of classes as {len(classes)}")
 
     print("Creating Recon Model")
     my_device = 'cuda:0'
