@@ -50,6 +50,8 @@ class Ensemble(nn.Module):
         return self
 
 def net_forward(frame):
+    if not classifier:
+        return None
     image = Image.fromarray(frame)
     image = trans(image).unsqueeze(0)
     if use_gpu:
@@ -123,8 +125,10 @@ def main():
             img_data_string = pickle.dumps(recon_encode)
             conn.sendall(struct.pack(">L", len(img_data_string)) + img_data_string)
 
-            picked_classes = get_classes(out)
-            print(picked_classes)
+            # Only classify if classifier isn't none
+            if classifier:
+                picked_classes = get_classes(out)
+                print(picked_classes)
 
             cv2.waitKey(1)
         except KeyboardInterrupt:
@@ -146,7 +150,7 @@ def fix_state_dict(state_dict):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("model_dir", type=str)
+    parser.add_argument("-model_dir", type=str, default=None)
     parser.add_argument("-imagenet_train_dir", type=str,
                          default='/home/jyurtsever/research/sim_train/data/imagenet_forward_2/train')
     parser.add_argument("-psf_file", type=str, default= '../../recon_files/psf_white_LED_Nick.tiff')
